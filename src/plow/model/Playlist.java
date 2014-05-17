@@ -13,9 +13,7 @@ public class Playlist extends Bound {
 	}
 
 	public void setName(String name) {
-		String oldName = this.name;
-		this.name = name;
-		changes.firePropertyChange("name", oldName, name);
+		changes.firePropertyChange("name", this.name, this.name = name);
 
 	}
 

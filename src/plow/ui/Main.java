@@ -1,6 +1,8 @@
 package plow.ui;
 
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Realm;
@@ -8,6 +10,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
@@ -17,19 +20,24 @@ import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 
 import plow.model.Playlist;
 import plow.model.Playlists;
 import plow.model.Track;
 
 public class Main {
+	private Binding artistBinding;
 	private DataBindingContext m_bindingContext;
 
 	protected Shell shlPlow;
@@ -37,6 +45,8 @@ public class Main {
 	private Table tblTracks;
 	private ListViewer listViewer;
 	private TableViewer tableViewer;
+	private Group grpTrack;
+	private Text text;
 
 	/**
 	 * Launch the application.
@@ -93,7 +103,10 @@ public class Main {
 		p.getTracks().add(t);
 		shlPlow.setSize(450, 300);
 		shlPlow.setText("Plow");
-		shlPlow.setLayout(new FillLayout(SWT.HORIZONTAL));
+		FillLayout fl_shlPlow = new FillLayout(SWT.HORIZONTAL);
+		fl_shlPlow.marginWidth = 3;
+		fl_shlPlow.marginHeight = 3;
+		shlPlow.setLayout(fl_shlPlow);
 
 		SashForm sashForm = new SashForm(shlPlow, SWT.NONE);
 
@@ -122,14 +135,27 @@ public class Main {
 				true, true));
 		tblclmnTitle.setText("Title");
 
-		Group grpTrack = new Group(sashForm_1, SWT.NONE);
+		grpTrack = new Group(sashForm_1, SWT.NONE);
 		grpTrack.setText("Track");
+
+		text = new Text(grpTrack, SWT.BORDER);
+		text.setBounds(134, 27, 76, 21);
+
+		Button btnNewButton = new Button(grpTrack, SWT.NONE);
+		btnNewButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				artistBinding.updateTargetToModel();
+			}
+		});
+		btnNewButton.setBounds(134, 92, 75, 25);
+		btnNewButton.setText("Speichern");
 		sashForm_1.setWeights(new int[] { 1, 1 });
-		sashForm.setWeights(new int[] { 1, 1 });
+		sashForm.setWeights(new int[] { 1, 3 });
 
 		m_bindingContext = initDataBindings();
 		playlists.addPlaylist(p);
-
+		artistBinding.validateTargetToModel();
 	}
 
 	protected DataBindingContext initDataBindings() {
@@ -159,6 +185,27 @@ public class Main {
 		IObservableList playlistsPlaylistsObserveList = BeanProperties.list(
 				"playlists").observe(playlists);
 		listViewer.setInput(playlistsPlaylistsObserveList);
+		//
+		IObservableValue observeEnabledTextObserveWidget = WidgetProperties
+				.enabled().observe(text);
+		IObservableValue observeSingleSelectionIndexTblTracksObserveWidget_1 = WidgetProperties
+				.singleSelectionIndex().observe(tblTracks);
+		UpdateValueStrategy strategy_1 = new UpdateValueStrategy();
+		strategy_1.setConverter(new IntegerToBooleanConverter());
+		bindingContext.bindValue(observeEnabledTextObserveWidget,
+				observeSingleSelectionIndexTblTracksObserveWidget_1, null,
+				strategy_1);
+		//
+		IObservableValue observeTextTextObserveWidget = WidgetProperties.text(
+				SWT.Modify).observe(text);
+		IObservableValue observeSingleSelectionTableViewer = ViewerProperties
+				.singleSelection().observe(tableViewer);
+		IObservableValue tableViewerArtistObserveDetailValue = BeanProperties
+				.value(Track.class, "artist", String.class).observeDetail(
+						observeSingleSelectionTableViewer);
+		artistBinding = bindingContext.bindValue(observeTextTextObserveWidget,
+				tableViewerArtistObserveDetailValue, new UpdateValueStrategy(
+						UpdateValueStrategy.POLICY_ON_REQUEST), null);
 		//
 		return bindingContext;
 	}

@@ -9,8 +9,7 @@ public class Track extends Bound {
 	}
 
 	public void setArtist(String artist) {
-		changes.firePropertyChange("artist", this.artist, artist);
-		this.artist = artist;
+		changes.firePropertyChange("artist", this.artist, this.artist = artist);
 	}
 
 	public String getTitle() {
@@ -18,10 +17,7 @@ public class Track extends Bound {
 	}
 
 	public void setTitle(String title) {
-		String oldTitle = this.title;
-		this.title = title;
-		changes.firePropertyChange("title", oldTitle, title);
-		
+		changes.firePropertyChange("title", this.title, this.title = title);
 	}
 
 	public String getFilename() {
@@ -29,9 +25,8 @@ public class Track extends Bound {
 	}
 
 	public void setFilename(String filename) {
-		String oldFilename = this.filename;
-		this.filename = filename;
-		changes.firePropertyChange("artist", oldFilename, filename);
+		changes.firePropertyChange("artist", this.filename,
+				this.filename = filename);
 	}
 
 }
