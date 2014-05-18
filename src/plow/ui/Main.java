@@ -31,9 +31,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import plow.libraries.DirectoryScanner;
+import plow.model.ArgumentSettings;
 import plow.model.Playlist;
 import plow.model.Playlists;
+import plow.model.Settings;
 import plow.model.Track;
 
 public class Main {
@@ -47,6 +51,8 @@ public class Main {
 	private TableViewer tableViewer;
 	private Group grpTrack;
 	private Text text;
+	private final FormToolkit formToolkit = new FormToolkit(
+			Display.getDefault());
 
 	/**
 	 * Launch the application.
@@ -55,11 +61,16 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		Display display = Display.getDefault();
+		final Settings settings = new ArgumentSettings(args);
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				try {
 					Main window = new Main();
+					DirectoryScanner ds = new DirectoryScanner();
+					for (Playlist p : ds.scanDirectory(settings
+							.getLibraryPath()))
+						window.playlists.addPlaylist(p);
 					window.open();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -88,19 +99,7 @@ public class Main {
 	 */
 	protected void createContents() {
 		shlPlow = new Shell();
-		Playlist p = new Playlist();
-		playlists.getPlaylists().add(p);
-		Track t = new Track();
-		t.setTitle("Atemlos");
-		t.setArtist("Helene Fischer");
-		p.setName("Schlager");
-		p.getTracks().add(t);
-		p = new Playlist();
-		p.setName("Grindcore");
-		t = new Track();
-		t.setArtist("Excrementory Grindfuckers");
-		t.setTitle("Looking for grindcore");
-		p.getTracks().add(t);
+
 		shlPlow.setSize(450, 300);
 		shlPlow.setText("Plow");
 		FillLayout fl_shlPlow = new FillLayout(SWT.HORIZONTAL);
@@ -126,7 +125,7 @@ public class Main {
 		tblTracks.setLinesVisible(true);
 
 		TableColumn tblclmnArtist = new TableColumn(tblTracks, SWT.NONE);
-		tcl_composite.setColumnData(tblclmnArtist, new ColumnPixelData(150,
+		tcl_composite.setColumnData(tblclmnArtist, new ColumnPixelData(300,
 				true, true));
 		tblclmnArtist.setText("Artist");
 
@@ -134,6 +133,11 @@ public class Main {
 		tcl_composite.setColumnData(tblclmnTitle, new ColumnPixelData(150,
 				true, true));
 		tblclmnTitle.setText("Title");
+
+		TableColumn tblclmnFilename = new TableColumn(tblTracks, SWT.NONE);
+		tcl_composite.setColumnData(tblclmnFilename, new ColumnPixelData(150,
+				true, true));
+		tblclmnFilename.setText("Filename");
 
 		grpTrack = new Group(sashForm_1, SWT.NONE);
 		grpTrack.setText("Track");
@@ -154,8 +158,6 @@ public class Main {
 		sashForm.setWeights(new int[] { 1, 3 });
 
 		m_bindingContext = initDataBindings();
-		playlists.addPlaylist(p);
-		artistBinding.validateTargetToModel();
 	}
 
 	protected DataBindingContext initDataBindings() {
@@ -164,7 +166,7 @@ public class Main {
 		ObservableListContentProvider listContentProvider_1 = new ObservableListContentProvider();
 		IObservableMap[] observeMaps = BeansObservables.observeMaps(
 				listContentProvider_1.getKnownElements(), Track.class,
-				new String[] { "artist", "title" });
+				new String[] { "artist", "title", "filename" });
 		tableViewer
 				.setLabelProvider(new ObservableMapLabelProvider(observeMaps));
 		tableViewer.setContentProvider(listContentProvider_1);
