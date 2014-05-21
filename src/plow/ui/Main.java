@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import plow.libraries.DirectoryScanner;
+import plow.libraries.TraktorLibraryWriter;
 import plow.model.ArgumentSettings;
 import plow.model.Playlist;
 import plow.model.Playlists;
@@ -51,28 +52,30 @@ public class Main {
 	private TableViewer tableViewer;
 	private Group grpTrack;
 	private Text text;
-	private final FormToolkit formToolkit = new FormToolkit(
-			Display.getDefault());
+	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 
 	/**
 	 * Launch the application.
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		Display display = Display.getDefault();
+	public static void main(final String[] args) {
+		final Display display = Display.getDefault();
 		final Settings settings = new ArgumentSettings(args);
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				try {
-					Main window = new Main();
-					DirectoryScanner ds = new DirectoryScanner();
-					for (Playlist p : ds.scanDirectory(settings
-							.getLibraryPath()))
+					final Main window = new Main();
+					final TraktorLibraryWriter tw = new TraktorLibraryWriter();
+					tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(),
+							settings.getLibraryPath(), null);
+					final DirectoryScanner ds = new DirectoryScanner();
+					for (final Playlist p : ds.scanDirectory(settings.getLibraryPath())) {
 						window.playlists.addPlaylist(p);
+					}
 					window.open();
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -83,7 +86,7 @@ public class Main {
 	 * Open the window.
 	 */
 	public void open() {
-		Display display = Display.getDefault();
+		final Display display = Display.getDefault();
 		createContents();
 		shlPlow.open();
 		shlPlow.layout();
@@ -102,41 +105,37 @@ public class Main {
 
 		shlPlow.setSize(450, 300);
 		shlPlow.setText("Plow");
-		FillLayout fl_shlPlow = new FillLayout(SWT.HORIZONTAL);
+		final FillLayout fl_shlPlow = new FillLayout(SWT.HORIZONTAL);
 		fl_shlPlow.marginWidth = 3;
 		fl_shlPlow.marginHeight = 3;
 		shlPlow.setLayout(fl_shlPlow);
 
-		SashForm sashForm = new SashForm(shlPlow, SWT.NONE);
+		final SashForm sashForm = new SashForm(shlPlow, SWT.NONE);
 
 		listViewer = new ListViewer(sashForm, SWT.BORDER | SWT.V_SCROLL);
-		org.eclipse.swt.widgets.List lstPlaylists = listViewer.getList();
+		final org.eclipse.swt.widgets.List lstPlaylists = listViewer.getList();
 
-		SashForm sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);
+		final SashForm sashForm_1 = new SashForm(sashForm, SWT.VERTICAL);
 
-		Composite composite = new Composite(sashForm_1, SWT.NONE);
-		TableColumnLayout tcl_composite = new TableColumnLayout();
+		final Composite composite = new Composite(sashForm_1, SWT.NONE);
+		final TableColumnLayout tcl_composite = new TableColumnLayout();
 		composite.setLayout(tcl_composite);
 
-		tableViewer = new TableViewer(composite, SWT.BORDER
-				| SWT.FULL_SELECTION);
+		tableViewer = new TableViewer(composite, SWT.BORDER | SWT.FULL_SELECTION);
 		tblTracks = tableViewer.getTable();
 		tblTracks.setHeaderVisible(true);
 		tblTracks.setLinesVisible(true);
 
-		TableColumn tblclmnArtist = new TableColumn(tblTracks, SWT.NONE);
-		tcl_composite.setColumnData(tblclmnArtist, new ColumnPixelData(300,
-				true, true));
+		final TableColumn tblclmnArtist = new TableColumn(tblTracks, SWT.NONE);
+		tcl_composite.setColumnData(tblclmnArtist, new ColumnPixelData(300, true, true));
 		tblclmnArtist.setText("Artist");
 
-		TableColumn tblclmnTitle = new TableColumn(tblTracks, SWT.NONE);
-		tcl_composite.setColumnData(tblclmnTitle, new ColumnPixelData(150,
-				true, true));
+		final TableColumn tblclmnTitle = new TableColumn(tblTracks, SWT.NONE);
+		tcl_composite.setColumnData(tblclmnTitle, new ColumnPixelData(150, true, true));
 		tblclmnTitle.setText("Title");
 
-		TableColumn tblclmnFilename = new TableColumn(tblTracks, SWT.NONE);
-		tcl_composite.setColumnData(tblclmnFilename, new ColumnPixelData(150,
-				true, true));
+		final TableColumn tblclmnFilename = new TableColumn(tblTracks, SWT.NONE);
+		tcl_composite.setColumnData(tblclmnFilename, new ColumnPixelData(150, true, true));
 		tblclmnFilename.setText("Filename");
 
 		grpTrack = new Group(sashForm_1, SWT.NONE);
@@ -145,10 +144,10 @@ public class Main {
 		text = new Text(grpTrack, SWT.BORDER);
 		text.setBounds(134, 27, 76, 21);
 
-		Button btnNewButton = new Button(grpTrack, SWT.NONE);
+		final Button btnNewButton = new Button(grpTrack, SWT.NONE);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				artistBinding.updateTargetToModel();
 			}
 		});
@@ -161,50 +160,48 @@ public class Main {
 	}
 
 	protected DataBindingContext initDataBindings() {
-		DataBindingContext bindingContext = new DataBindingContext();
+		final DataBindingContext bindingContext = new DataBindingContext();
 		//
-		ObservableListContentProvider listContentProvider_1 = new ObservableListContentProvider();
-		IObservableMap[] observeMaps = BeansObservables.observeMaps(
-				listContentProvider_1.getKnownElements(), Track.class,
-				new String[] { "artist", "title", "filename" });
-		tableViewer
-				.setLabelProvider(new ObservableMapLabelProvider(observeMaps));
+		final ObservableListContentProvider listContentProvider_1 = new ObservableListContentProvider();
+		final IObservableMap[] observeMaps = BeansObservables.observeMaps(
+				listContentProvider_1.getKnownElements(), Track.class, new String[] { "artist",
+						"title", "filename" });
+		tableViewer.setLabelProvider(new ObservableMapLabelProvider(observeMaps));
 		tableViewer.setContentProvider(listContentProvider_1);
 		//
-		IObservableValue observeSingleSelectionListViewer = ViewerProperties
+		final IObservableValue observeSingleSelectionListViewer = ViewerProperties
 				.singleSelection().observe(listViewer);
-		IObservableList listViewerTracksObserveDetailList = BeanProperties
-				.list(Playlist.class, "tracks", Track.class).observeDetail(
-						observeSingleSelectionListViewer);
+		final IObservableList listViewerTracksObserveDetailList = BeanProperties.list(
+				Playlist.class, "tracks", Track.class).observeDetail(
+				observeSingleSelectionListViewer);
 		tableViewer.setInput(listViewerTracksObserveDetailList);
 		//
-		ObservableListContentProvider listContentProvider = new ObservableListContentProvider();
-		IObservableMap observeMap = BeansObservables.observeMap(
+		final ObservableListContentProvider listContentProvider = new ObservableListContentProvider();
+		final IObservableMap observeMap = BeansObservables.observeMap(
 				listContentProvider.getKnownElements(), Playlist.class, "name");
 		listViewer.setLabelProvider(new ObservableMapLabelProvider(observeMap));
 		listViewer.setContentProvider(listContentProvider);
 		//
-		IObservableList playlistsPlaylistsObserveList = BeanProperties.list(
-				"playlists").observe(playlists);
+		final IObservableList playlistsPlaylistsObserveList = BeanProperties.list("playlists")
+				.observe(playlists);
 		listViewer.setInput(playlistsPlaylistsObserveList);
 		//
-		IObservableValue observeEnabledTextObserveWidget = WidgetProperties
-				.enabled().observe(text);
-		IObservableValue observeSingleSelectionIndexTblTracksObserveWidget_1 = WidgetProperties
+		final IObservableValue observeEnabledTextObserveWidget = WidgetProperties.enabled()
+				.observe(text);
+		final IObservableValue observeSingleSelectionIndexTblTracksObserveWidget_1 = WidgetProperties
 				.singleSelectionIndex().observe(tblTracks);
-		UpdateValueStrategy strategy_1 = new UpdateValueStrategy();
+		final UpdateValueStrategy strategy_1 = new UpdateValueStrategy();
 		strategy_1.setConverter(new IntegerToBooleanConverter());
 		bindingContext.bindValue(observeEnabledTextObserveWidget,
-				observeSingleSelectionIndexTblTracksObserveWidget_1, null,
-				strategy_1);
+				observeSingleSelectionIndexTblTracksObserveWidget_1, null, strategy_1);
 		//
-		IObservableValue observeTextTextObserveWidget = WidgetProperties.text(
-				SWT.Modify).observe(text);
-		IObservableValue observeSingleSelectionTableViewer = ViewerProperties
+		final IObservableValue observeTextTextObserveWidget = WidgetProperties.text(SWT.Modify)
+				.observe(text);
+		final IObservableValue observeSingleSelectionTableViewer = ViewerProperties
 				.singleSelection().observe(tableViewer);
-		IObservableValue tableViewerArtistObserveDetailValue = BeanProperties
-				.value(Track.class, "artist", String.class).observeDetail(
-						observeSingleSelectionTableViewer);
+		final IObservableValue tableViewerArtistObserveDetailValue = BeanProperties.value(
+				Track.class, "artist", String.class).observeDetail(
+				observeSingleSelectionTableViewer);
 		artistBinding = bindingContext.bindValue(observeTextTextObserveWidget,
 				tableViewerArtistObserveDetailValue, new UpdateValueStrategy(
 						UpdateValueStrategy.POLICY_ON_REQUEST), null);
