@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<NML VERSION="18">
+    <HEAD COMPANY="www.native-instruments.com" PROGRAM="Traktor"/>
+
+    <!-- MUSICFOLDERS is probably always empty -- even though I specified multiple folders in the settings -->
+    <MUSICFOLDERS>
+    </MUSICFOLDERS>
+
+    <!-- The array of all track collection entries -->
+    <COLLECTION ENTRIES="1388">
+        <!-- A track/sample in the track collection
+             MODIFIED_DATE:
+                The date of last modification of the file. This should equal the Explorer/Finder's last modification date.
+                Format: YYYY-MM-DD, where month and date probably don't have leading zeros
+             MODIFIED_TIME:
+                The time of last modification of the file. This should equal the Explorer/Finder's last modification date.
+                Format: seconds after midnight in UTC, in this example: 16*3600 + 36*60 + some seconds - 2*3600
+             AUDIO_ID:
+                Probably the hardest riddle of the NML format - W.T.F.? -TODO-
+             TITLE
+                Should represent the ID3 title field
+             ARTIST
+                Should represent the ID3 artist field  -->
+        <ENTRY
+          MODIFIED_DATE="2014/5/15" 
+          MODIFIED_TIME="52596" 
+          AUDIO_ID="AVBaqpuauaqaqaqaqambmqmqmqqqmpm5q87N3d3N7d3O7eze3d3e3dvLqoiYiJz////////////////////////////////////////////93//////////////////////////////qur3M3bzMu7qqmu///f//7v//7///z//+3//s3//s3u3+7/////////////////////////////////////////267P//////////////////////////////////////////////////////////////////////////xP////////////////////////////9jAAAAAA==" 
+          TITLE="Feed The Dada (Original Mix)" 
+          ARTIST="Dada Life">
+            <!-- The location of the track on the hard disk 
+                 DIR:
+                    The directory, excluding the drive letter (Windows)/volume name (Mac)
+                    Format: All folders, probably htmlencoded (& is turned into &amp;), separated by /:
+                 FILE
+                    The file name
+                Volume
+                    Probably the drive/volume name
+                VOLUMEID
+                    Proably the drive letter (Windows) / volume name (Mac) -->
+            <LOCATION 
+              DIR="/:Users/:max/:Music/:Maxwell &amp; Millfield/:Tracks/:Electro House/:" 
+              FILE="Feed The Dada (Original Mix).mp3" 
+              VOLUME="Macintosh HD" 
+              VOLUMEID="Macintosh HD"/>
+
+            <!-- Album information
+                TITLE: probably represents the ID3 album title field 
+                TRACK: probably represents the Track no field, e.g. TRACK="1" -->
+            <ALBUM TITLE="Feed The Dada"/>
+
+            <!--TODO-->
+            <MODIFICATION_INFO AUTHOR_TYPE="user"/>
+
+            <!-- Additional information about the track
+                 BITRATE:
+                    The bit rate [bit/s]
+                GENRE:
+                    The ID3 Genre
+                COMMENT:
+                    The ID3 Comment
+                PLAYTIME:
+                    The playtime in seconds, may be rounded
+                RANKING:
+                    The rating, where each star represents the value 51
+                    0 STARS = RANKING="0"
+                    1 STAR  = RANKING="51"
+                    2 STARS = RANKING="102"
+                    3 STARS = RANKING="153"
+                    4 STARS = RANKING="204"
+                    5 STARS = RANKING="255"
+                FLAGS:
+                    -TODO-
+                FILESIZE
+                    The filesize, probably of the audio only, because the file has 15070375 byte in total -->
+            <INFO
+              BITRATE="320000" 
+              GENRE="Electro House" 
+              COMMENT="06A - Purchased at Beatport.com" 
+              KEY="2d" 
+              PLAYTIME="335" 
+              RANKING="255" 
+              IMPORT_DATE="2012/11/14" 
+              RELEASE_DATE="2012/1/1" 
+              FLAGS="14" 
+              FILESIZE="14720"/>
+
+            <!-- BPM information
+                 BPM: The Beats/Minute [with 3 decimals precision]
+                 BPM_QUALITY: Always 100 -->
+            <TEMPO
+              BPM="128.001" 
+              BPM_QUALITY="100"/>
+
+            <!-- Loudness information for the Autogain (either PERCEIVED_DB or ANALYZED_DB represent the Autoain value)
+                 PEAK_DB: Probably the loudest peak of the track
+                 PERCEIVED_DB: Probably an overall indicator of the track loudness
+                 ANALYZED_DB: ?? -->
+            <LOUDNESS
+              PEAK_DB="-1.00289" 
+              PERCEIVED_DB="-2.43407" 
+              ANALYZED_DB="-2.43407"/>
+
+            <!-- The track key. VALUE represents the number of the 
+                 row in Traktor's Key/Key Text select field, starting at 0.
+                 VALUE / Key / Key (simple)
+                  0      Ab     1d
+                  1      A      8d
+                  2      A#     3d
+                  3      Bb    10d
+                  4      B      5d
+                  5      C     12d
+                  6      C#     7d
+                  7      Db     2d
+                  8      D      9d
+                  9      D#     4d
+                 10      Eb    11d
+                 11      E      6d
+                 .... -->
+            <MUSICAL_KEY VALUE="7"/>
+
+            
+            <!-- Cue points
+                NAME:
+                    The displayed Cue point name, commonly "AutoGrid", "Beat Marker" or "n.n."
+                DISPL_ORDER:
+                    Always "0"
+                TYPE:
+                    The type (Cue/Grid/Fade In/...)
+                START:
+                    The position [ms]
+                LEN:
+                    The length (if the cue point is a loop) [ms]
+                REPEATS:
+                    Probably always "-1"
+                HOTCUE:
+                    The Hotcue number -->
+            <CUE_V2 
+              NAME="AutoGrid" 
+              DISPL_ORDER="0" 
+              TYPE="4" 
+              START="54.8346" 
+              LEN="0" 
+              REPEATS="-1" 
+              HOTCUE="0"/>
+
+            <CUE_V2
+              NAME="n.n." 
+              DISPL_ORDER="0" 
+              TYPE="0" 
+              START="2819.25" 
+              LEN="0" 
+              REPEATS="-1" 
+              HOTCUE="0"/>
+            <!-- more CUE_V2 can follow -->
+        </ENTRY>
+    </COLLECTION>
+
+    <!-- The array of all remix sets -->
+    <SETS ENTRIES="4">...</SETS>
+
+    <!-- The array of all stored playlists -->
+    <PLAYLISTS>
+        <NODE TYPE="FOLDER" NAME="$ROOT">
+            <!-- SUBNODE COUNT = Number of Playlists + 2 (for _LOOPS and _RECORDINGS) -->
+            <SUBNODES COUNT="11">
+                <!-- The special _LOOPS playlist (not displayed in Traktor) -->
+                <NODE
+                  TYPE="PLAYLIST"
+                  NAME="_LOOPS">
+                    <PLAYLIST 
+                      ENTRIES="0" 
+                      TYPE="LIST" 
+                      UUID="dd259feba92148c7a78ca5f1f6cd80f6">
+                    </PLAYLIST>
+                </NODE>
+
+                <!-- The static "Audio Recordings" playlist -->
+                <NODE
+                  TYPE="PLAYLIST" 
+                  NAME="_RECORDINGS">
+                    <PLAYLIST 
+                      ENTRIES="0" 
+                      TYPE="LIST" 
+                      UUID="7519821ff5e34391922da9ac02e5cf29">
+                    </PLAYLIST>
+                </NODE>
+
+                <!-- A normal playlist. It seems like Traktor doesn't mind additional attributes in here,
+                     so we could add GENERATED_BY="PLOW" to know which ones were automatically generated.
+                     TYPE: Always "PLAYLIST"
+                     NAME: The Playlist name -->
+                <NODE 
+                  TYPE="PLAYLIST" 
+                  NAME="Deep House">
+
+                    <!-- ENTRIES: The number of tracks in the playlist
+                         TYPE: Always "LIST"
+                         UUID: The UUID [32 hexadecimals]. This can be randomly generated! -->
+                    <PLAYLIST 
+                      ENTRIES="43" 
+                      TYPE="LIST" 
+                      UUID="fc3c87f22859469f938cc9a86dc1e685">
+                        <!-- A track/sample in a playlist. -->
+                        <ENTRY>
+                            <!-- TYPE: TRACK for normal tracks and samples ("SET" is described further down)
+                                 KEY: The track path including drive letter (Win)/volume name (Mac), kind-of HTML-encoded, 
+                                      using /: as directory separator. If the Track doesn't exist, Traktor will simply
+                                      remove the <ENTRY> without further failure. -->
+                            <PRIMARYKEY 
+                              TYPE="TRACK" 
+                              KEY="Macintosh HD/:Users/:max/:Music/:Maxwell &amp; Millfield/:Tracks/:Deep House/:01 - Ready For Your Love [Feat_ MNEK](1).mp3">
+                            </PRIMARYKEY>
+                        </ENTRY>
+
+                        <!-- A remix set in a playlist -->
+                        <ENTRY>
+                            <!-- TYPE: SET for Remix sets 
+                                 KEY: -TODO- -->
+                            <PRIMARYKEY 
+                              TYPE="SET" 
+                              KEY="/:2012y05m09d_14h33m55s35807589894.set">
+                            </PRIMARYKEY>
+                        </ENTRY>
+
+                        <!-- ... more ENTRYs following -->
+                    </PLAYLIST>
+                </NODE>
+                <!-- ... more NODEs following -->
+        </SUBNODES>
+        </NODE>
+</PLAYLISTS>
+
+    <!-- All customized sorting orders. When clicking on a table heading in the track browser, 
+         the sorting order is stored in the following nodes. This may be used to specify a
+         useful default sorting order for the playlists! :-) -->
+    <SORTING_ORDER PATH="$COLLECTION">
+        <!-- SORTING_DATA represents a sort command. It is possible to order by multiple columns, 
+             by using multiple SORTING_DATA nodes. They are listed by descending priority (the 
+             first SORTING_DATA is the most important)
+
+             ORD="0" represents ASCENDING order
+             ORD="1" represents DESCENDING order
+
+             IDX represents the ID of the column sorted by:
+              5 BPM
+             28 Key
+             33 Title
+             ... -->
+        <SORTING_DATA IDX="28" ORD="0"/>
+        <SORTING_DATA IDX="2" ORD="1"/>
+    </SORTING_ORDER>
+        <SORTING_ORDER PATH="Deep House">
+        <SORTING_DATA IDX="33" ORD="0"/>
+    </SORTING_ORDER>
+    <SORTING_ORDER PATH="Electro Pop">
+        <SORTING_DATA IDX="28" ORD="0"/>
+        <SORTING_DATA IDX="27" ORD="1"/>
+    </SORTING_ORDER>
+    <!-- ... more SORTING_ORDER nodes following -->
+</NML>
