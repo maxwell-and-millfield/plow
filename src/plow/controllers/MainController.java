@@ -1,16 +1,18 @@
 package plow.controllers;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -22,49 +24,96 @@ import plow.model.Playlist;
 import plow.model.Settings;
 import plow.model.Track;
 
+/**
+ * The Main Controller. It initializes the Models and Views for Main.fxml.
+ * 
+ * @author Maxwell & Millfield
+ */
 public class MainController implements Initializable {
 
-	@FXML
-	private ListView<Playlist> playlistsView;
+	@FXML private ListView<Playlist> playlistsView;
 
-	@FXML
-	private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
+	@FXML private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
 
-	@FXML
-	private TableView<Track> tracksTable;
+	@FXML private TableView<Track> tracksTable;
 
 	private ObservableList<Playlist> playlists;
 
-	private void initializeModels() {
-		Settings settings = new ArgumentSettings();
-		TraktorLibraryWriter tw = new TraktorLibraryWriter();
-		tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
-		DirectoryScanner ds = new DirectoryScanner();
-
-		playlists = FXCollections.observableArrayList(ds.scanDirectory(settings.getLibraryPath()));
-	}
-
 	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		initializeModels();
-		
-		playlistsView.setItems(playlists);
+	public void initialize(final URL location, final ResourceBundle resources) {
 		playlistsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		playlistsView.getSelectionModel().selectedItemProperty().addListener(playlistChangeListener);
+		playlistsView.getSelectionModel().selectedItemProperty()
+				.addListener(playlistChangeListener);
 
 		titleColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("title"));
 		artistColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("artist"));
-		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("filename"));
+		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>(
+				"filenameWithPrefix"));
+		tracksTable.getSortOrder().add(titleColumn);
 
-		if (playlists.size() > 0) {
-			playlistsView.getSelectionModel().select(0);
-		}
+		// Display a spinner as placeholder while the playlists load
+		playlistsView.setPlaceholder(null);
+		final ProgressIndicator spinner = new ProgressIndicator();
+		spinner.setMaxHeight(50);
+		tracksTable.setPlaceholder(spinner);
+
+		// Load the playlists!
+		initializeModels();
+	}
+
+	private void initializeModels() {
+		final Settings settings = new ArgumentSettings();
+
+		// TODO: Init Traktor stuff in background
+		final TraktorLibraryWriter tw = new TraktorLibraryWriter();
+		tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
+
+		// Scan the Library path and load all tracks and playlists
+		new Thread(new LoadPlaylistsTask(settings.getLibraryPath())).start();
 	}
 
 	private final ChangeListener<Playlist> playlistChangeListener = new ChangeListener<Playlist>() {
+
 		@Override
-		public void changed(ObservableValue<? extends Playlist> observable, Playlist old, Playlist selected) {
+		public void changed(final ObservableValue<? extends Playlist> observable,
+				final Playlist old, final Playlist selected) {
+			tracksTable.setPlaceholder(new Label("No tracks in \"" + selected.getName() + "\"."));
 			tracksTable.setItems(selected.getTracks());
+
+			// manually sort the table, elsewise the rows are unsorted even
+			// though a sort order may still be indicated in the table header
+			// #FunWithJava
+			tracksTable.sort();
+		}
+
+	};
+
+	private class LoadPlaylistsTask extends Task<ObservableList<Playlist>> {
+
+		private final String path;
+
+		public LoadPlaylistsTask(final String path) {
+			super();
+			this.path = path;
+		}
+
+		@Override
+		protected ObservableList<Playlist> call() throws Exception {
+			final DirectoryScanner ds = new DirectoryScanner();
+			return FXCollections.observableArrayList(ds.scanDirectory(path));
+		}
+
+		@Override
+		protected void succeeded() {
+			playlists = getValue();
+
+			playlistsView.setItems(playlists);
+			playlistsView.setPlaceholder(new Label("No playlists found."));
+
+			if (!playlists.isEmpty()) {
+				// display the first playlist if possible
+				playlistsView.getSelectionModel().select(0);
+			}
 		}
 	};
 
