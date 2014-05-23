@@ -1,24 +1,32 @@
 package plow.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class Playlist extends Bound {
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-	private String name;
-	private final List<Track> tracks = new ArrayList<Track>();
+public class Playlist {
+
+	private StringProperty name = new SimpleStringProperty();
+	private ObservableList<Track> tracks = FXCollections.observableArrayList();
 
 	public String getName() {
-		return name;
+		return name.get();
 	}
 
 	public void setName(String name) {
-		changes.firePropertyChange("name", this.name, this.name = name);
-
+		this.name.set(name);
 	}
 
-	public List<Track> getTracks() {
+	public ObservableList<Track> getTracks() {
 		return tracks;
+	}
+
+	@Override
+	public String toString() {
+		return getName();
 	}
 
 }

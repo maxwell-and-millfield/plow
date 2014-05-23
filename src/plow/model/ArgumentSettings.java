@@ -4,13 +4,17 @@ public class ArgumentSettings implements Settings {
 
 	String traktor, library;
 
-	public ArgumentSettings(final String args[]) {
-		System.out.println(args);
-		if (args.length != 2) {
-			throw new RuntimeException("No paths for library and traktor library given.");
+	public ArgumentSettings() {
+		if (System.getProperty("library") == null) {
+			throw new RuntimeException("No path for music library folder given. "
+					+ "Usage: -Dlibrary=/path/to/music/library/");
+		} else if (System.getProperty("traktor") == null) {
+			throw new RuntimeException("No path for Traktor collection given. "
+					+ "Usage -Dtraktor=/path/to/traktor/collection.nml");
+		} else {
+			library = System.getProperty("library");
+			traktor = System.getProperty("traktor");
 		}
-		library = args[0];
-		traktor = args[1];
 	}
 
 	@Override
