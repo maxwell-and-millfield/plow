@@ -8,8 +8,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -19,12 +17,17 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+
+import org.jaudiotagger.tag.FieldKey;
+
 import plow.libraries.DirectoryScanner;
 import plow.libraries.TraktorLibraryWriter;
 import plow.model.ArgumentSettings;
 import plow.model.Playlist;
 import plow.model.Settings;
 import plow.model.Track;
+import plow.model.TrackId3TagValueFactory;
+import plow.ui.EditingCell;
 
 /**
  * The Main Controller. It initializes the Models and Views for Main.fxml.
@@ -48,10 +51,15 @@ public class MainController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		playlistsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		playlistsView.getSelectionModel().selectedItemProperty().addListener(playlistChangeListener);
-
-		titleColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("title"));
-		artistColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("artist"));
+	              
+		titleColumn.setCellValueFactory(new TrackId3TagValueFactory(FieldKey.TITLE));
+		artistColumn.setCellValueFactory(new TrackId3TagValueFactory(FieldKey.ARTIST));
 		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("filenameWithPrefix"));
+
+		// make the Table editable, by placing TextFields in the Cells
+		titleColumn.setCellFactory(EditingCell.<Track>getCellFactory());
+		artistColumn.setCellFactory(EditingCell.<Track>getCellFactory());
+		
 		tracksTable.getSortOrder().add(titleColumn);
 
 		// Display a spinner as placeholder while the playlists load
