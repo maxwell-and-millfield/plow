@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 
 import plow.model.Playlist;
@@ -42,20 +41,19 @@ public class DirectoryScanner {
 	}
 
 	private Track getTrack(File file, String prefix) {
-		Track t = new Track();
-		t.setFilename(prefix + "/" + file.getName());
+		AudioFile audioFile = null;
+		
 		try {
-			Tag tag = AudioFileIO.read(file).getTag();
-			t.setArtist(tag.getFirst(FieldKey.ARTIST));
-			t.setTitle(tag.getFirst(FieldKey.TITLE));
-		} catch (CannotReadException | IOException | TagException
-				| ReadOnlyFileException | InvalidAudioFrameException e) {
-			t.setArtist("");
-			t.setTitle(file.getName());
+			audioFile = AudioFileIO.read(file);
+		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
 			e.printStackTrace();
 		}
 
-		return t;
+		Track track = new Track(audioFile);
+		// prefix the file name with the folder name and a slash
+		track.setFilenamePrefix(prefix + File.separator);
+
+		return track;
 	}
 
 	private boolean isTrackFile(File file) {

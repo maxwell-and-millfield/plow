@@ -26,6 +26,11 @@ import plow.model.Playlist;
 import plow.model.Settings;
 import plow.model.Track;
 
+/**
+ * The Main Controller. It initializes the Models and Views for Main.fxml.
+ * 
+ * @author Maxwell & Millfield
+ */
 public class MainController implements Initializable {
 
 	@FXML
@@ -36,61 +41,81 @@ public class MainController implements Initializable {
 
 	@FXML
 	private TableView<Track> tracksTable;
+	
+	private ObservableList<Playlist> playlists;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		playlistsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		playlistsView.getSelectionModel().selectedItemProperty().addListener(playlistChangeListener);
-		
+
 		titleColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("title"));
 		artistColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("artist"));
-		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("filename"));
-		
-		// Only display as spinner as placeholder, while the playlists load
+		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("filenameWithPrefix"));
+		tracksTable.getSortOrder().add(titleColumn);
+
+		// Display a spinner as placeholder while the playlists load
 		playlistsView.setPlaceholder(null);
 		ProgressIndicator spinner = new ProgressIndicator();
 		spinner.setMaxHeight(50);
 		tracksTable.setPlaceholder(spinner);
-		
+
 		// Load the playlists!
 		initializeModels();
 	}
-	
+
 	private void initializeModels() {
-		loadPlaylistsTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-			@Override
-			public void handle(WorkerStateEvent event) {
-				playlistsView.setItems(loadPlaylistsTask.getValue());
-				playlistsView.setPlaceholder(new Label("No playlists found."));
-				
-				if(!playlistsView.getItems().isEmpty()) {
-					// display the first playlist if possible
-					playlistsView.getSelectionModel().select(0);
-				}
-			}
-		});
+		Settings settings = new ArgumentSettings();
 		
-		new Thread(loadPlaylistsTask).start();
+		// TODO: Init Traktor stuff in background
+		TraktorLibraryWriter tw = new TraktorLibraryWriter();
+		tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
+		
+		// Scan the Library path and load all tracks and playlists
+		new Thread(new LoadPlaylistsTask(settings.getLibraryPath())).start();
 	}
 
 	private final ChangeListener<Playlist> playlistChangeListener = new ChangeListener<Playlist>() {
+
 		@Override
 		public void changed(ObservableValue<? extends Playlist> observable, Playlist old, Playlist selected) {
 			tracksTable.setPlaceholder(new Label("No tracks in \"" + selected.getName() + "\"."));
 			tracksTable.setItems(selected.getTracks());
-		}
-	};
-	
-	private final Task<ObservableList<Playlist>> loadPlaylistsTask = new Task<ObservableList<Playlist>>() {
 
+			// manually sort the table, elsewise the rows are unsorted even
+			// though a sort order may still be indicated in the table header
+			// #FunWithJava
+			tracksTable.sort();
+		}
+
+	};
+
+	private class LoadPlaylistsTask extends Task<ObservableList<Playlist>> {
+		
+		private String path;
+		
+		public LoadPlaylistsTask(String path) {
+			super();
+			this.path = path;
+		}
+		
 		@Override
 		protected ObservableList<Playlist> call() throws Exception {
-			Settings settings = new ArgumentSettings();
-			TraktorLibraryWriter tw = new TraktorLibraryWriter();
-			tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
 			DirectoryScanner ds = new DirectoryScanner();
+			return FXCollections.observableArrayList(ds.scanDirectory(path));
+		}
 
-			return FXCollections.observableArrayList(ds.scanDirectory(settings.getLibraryPath()));
+		@Override
+		protected void succeeded() {
+			playlists = getValue();
+
+			playlistsView.setItems(playlists);
+			playlistsView.setPlaceholder(new Label("No playlists found."));
+
+			if (!playlists.isEmpty()) {
+				// display the first playlist if possible
+				playlistsView.getSelectionModel().select(0);
+			}
 		}
 	};
 
