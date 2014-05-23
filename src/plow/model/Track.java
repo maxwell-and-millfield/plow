@@ -1,7 +1,9 @@
 package plow.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.tag.FieldKey;
@@ -11,49 +13,46 @@ public class Track {
 
 	private AudioFile file;
 
+	private Tag tag;
+	private Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
+
 	/**
 	 * a prefix displayed before the filename. Good prefixes can be playlist
 	 * names, parent directory names or music collection names.
 	 */
 	private String filenamePrefix = "";
 
-	private StringProperty artist = new SimpleStringProperty();
-	private StringProperty title = new SimpleStringProperty();
-
 	public Track(AudioFile file) {
-		Tag tag = file.getTag();
-
 		this.file = file;
-		this.artist.set(tag.getFirst(FieldKey.ARTIST));
-		this.title.set(tag.getFirst(FieldKey.TITLE));
+		this.tag = file.getTag();
 	}
 
-	public String getArtist() {
-		return artist.get();
+	public Id3TagProperty getId3TagProperty(final FieldKey key) {
+		if (key == null) {
+			throw new NullPointerException();
+		} else {
+			Id3TagProperty property = tagProperties.get(key);
+
+			if (property == null) {
+				property = new Id3TagProperty(tag, key);
+				tagProperties.put(key, property);
+			}
+
+			return property;
+		}
 	}
 
-	public void setArtist(String artist) {
-		this.artist.set(artist);
+	public String getId3TagValue(FieldKey key) {
+		SimpleStringProperty property = getId3TagProperty(key);
+		return property == null ? null : property.get();
 	}
 
-	public StringProperty getArtistProperty() {
-		return artist;
-	}
-
-	public String getTitle() {
-		return title.get();
-	}
-
-	public void setTitle(String title) {
-		this.title.set(title);
-	}
-
-	public StringProperty getTitleProperty() {
-		return title;
+	public void setId3TagValue(FieldKey key, String value) {
+		getId3TagProperty(key).set(value);
 	}
 
 	public String getFilename() {
-		return (file == null) ? null : file.getFile().getName();
+		return file.getFile().getName();
 	}
 
 	/**
@@ -63,7 +62,7 @@ public class Track {
 	 *         "Deep House/Sleepless.mp3"
 	 */
 	public String getFilenameWithPrefix() {
-		return file == null ? null : filenamePrefix + file.getFile().getName();
+		return filenamePrefix + file.getFile().getName();
 	}
 
 	/**
