@@ -65,6 +65,7 @@ public class TraktorLibraryWriter {
 			throw new RuntimeException("Invalid NML");
 		}
 		System.out.println(nodeCollection.getAttributes().getNamedItem("ENTRIES").getNodeValue());
+		System.out.println(nodeCollection.getChildNodes().getLength());
 
 	}
 }

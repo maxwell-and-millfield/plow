@@ -19,7 +19,7 @@ public class Id3TagProperty extends SimpleStringProperty {
 		this.tag = tag;
 		this.key = key;
 		this.set(tag.getFirst(key));
-		this.addListener(onChangeListener);
+		this.addListener(onChangeListener); 
 	}
 
 	public Tag getTag() {

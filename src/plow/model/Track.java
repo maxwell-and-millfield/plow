@@ -28,25 +28,25 @@ public class Track {
 	}
 
 	public Id3TagProperty getId3TagProperty(final FieldKey key) {
-		if(key == null) {
+		if (key == null) {
 			throw new NullPointerException();
 		} else {
 			Id3TagProperty property = tagProperties.get(key);
-			
-			if(property == null) {
+
+			if (property == null) {
 				property = new Id3TagProperty(tag, key);
 				tagProperties.put(key, property);
 			}
-			
+
 			return property;
 		}
 	}
-	
+
 	public String getId3TagValue(FieldKey key) {
 		SimpleStringProperty property = getId3TagProperty(key);
 		return property == null ? null : property.get();
 	}
-	
+
 	public void setId3TagValue(FieldKey key, String value) {
 		getId3TagProperty(key).set(value);
 	}

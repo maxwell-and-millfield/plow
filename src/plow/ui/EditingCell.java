@@ -59,7 +59,7 @@ public class EditingCell<T> extends TableCell<T, String> {
 		textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
 		textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) { 
 				if (!arg2) {
 					commitEdit(textField.getText());
 				}

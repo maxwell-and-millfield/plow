@@ -42,7 +42,7 @@ public class DirectoryScanner {
 
 	private Track getTrack(File file, String prefix) {
 		AudioFile audioFile = null;
-		
+
 		try {
 			audioFile = AudioFileIO.read(file);
 		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {

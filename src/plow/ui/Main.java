@@ -18,10 +18,10 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
 	@Override
-	public void start(Stage primaryStage) throws IOException {
+	public void start(final Stage primaryStage) throws IOException {
 		primaryStage.setTitle("Plow");
 		// plow/ui/Main.fxml contains the Main layout
-		Parent parent = (Parent) FXMLLoader.load(getClass().getResource("Main.fxml"));
+		final Parent parent = (Parent) FXMLLoader.load(getClass().getResource("Main.fxml"));
 		primaryStage.setScene(new Scene(parent));
 		primaryStage.show();
 	}
@@ -31,7 +31,7 @@ public class Main extends Application {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// Prevent JAudioTagger from dumping thousands of useless INFO and
 		// WARNING messages to the log
 		Logger.getLogger("org.jaudiotagger").setLevel(Level.SEVERE);

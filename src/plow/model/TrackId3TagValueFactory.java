@@ -16,7 +16,7 @@ public class TrackId3TagValueFactory implements Callback<CellDataFeatures<Track,
 
 	@Override
 	public ObservableValue<String> call(CellDataFeatures<Track, String> param) {
-		return param.getValue().getId3TagProperty(key);
+		return param.getValue().getId3TagProperty(key); 
 	}
 
 }
