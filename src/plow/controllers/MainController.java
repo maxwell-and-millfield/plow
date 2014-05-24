@@ -1,14 +1,9 @@
 package plow.controllers;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
@@ -34,7 +29,7 @@ import plow.model.TrackId3TagValueFactory;
  * 
  * @author Maxwell & Millfield
  */
-public class MainController implements Initializable {
+public class MainController {
 
 	@FXML
 	private ListView<Playlist> playlistsView;
@@ -45,10 +40,10 @@ public class MainController implements Initializable {
 	@FXML
 	private TableView<Track> tracksTable;
 
-	private ObservableList<Playlist> playlists;
+	private MusicLibrary lib;
 
-	@Override
-	public void initialize(final URL location, final ResourceBundle resources) {
+	@FXML
+	public void initialize() {
 		playlistsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		playlistsView.getSelectionModel().selectedItemProperty().addListener(playlistChangeListener);
 
@@ -61,8 +56,6 @@ public class MainController implements Initializable {
 		artistColumn.setCellFactory(TextFieldTableCell.<Track> forTableColumn());
 
 		tracksTable.getSortOrder().add(titleColumn);
-
-		playlistsView.setPlaceholder(new Label("No playlists found."));
 
 		// Display a spinner as placeholder while the playlists load
 		playlistsView.setPlaceholder(null);
@@ -101,8 +94,6 @@ public class MainController implements Initializable {
 		}
 
 	};
-
-	private MusicLibrary lib;
 
 	private class LoadPlaylistsTask extends Task<Boolean> {
 
