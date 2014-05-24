@@ -11,10 +11,11 @@ import org.jaudiotagger.tag.Tag;
 
 public class Track {
 
-	private AudioFile file;
+	private final AudioFile file;
 
-	private Tag tag;
-	private Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
+	private final Tag tag;
+	private long lastModified;
+	private final Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
 
 	/**
 	 * a prefix displayed before the filename. Good prefixes can be playlist
@@ -22,7 +23,7 @@ public class Track {
 	 */
 	private String filenamePrefix = "";
 
-	public Track(AudioFile file) {
+	public Track(final AudioFile file) {
 		this.file = file;
 		this.tag = file.getTag();
 	}
@@ -42,12 +43,12 @@ public class Track {
 		}
 	}
 
-	public String getId3TagValue(FieldKey key) {
-		SimpleStringProperty property = getId3TagProperty(key);
+	public String getId3TagValue(final FieldKey key) {
+		final SimpleStringProperty property = getId3TagProperty(key);
 		return property == null ? null : property.get();
 	}
 
-	public void setId3TagValue(FieldKey key, String value) {
+	public void setId3TagValue(final FieldKey key, final String value) {
 		getId3TagProperty(key).set(value);
 	}
 
@@ -88,6 +89,14 @@ public class Track {
 		}
 
 		this.filenamePrefix = filenamePrefix;
+	}
+
+	public long getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(final long lastModified) {
+		this.lastModified = lastModified;
 	}
 
 }

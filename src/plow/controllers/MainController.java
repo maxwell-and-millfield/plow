@@ -21,6 +21,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.jaudiotagger.tag.FieldKey;
 
 import plow.libraries.DirectoryScanner;
+import plow.libraries.MusicLibrary;
 import plow.libraries.TraktorLibraryWriter;
 import plow.model.ArgumentSettings;
 import plow.model.Playlist;
@@ -36,25 +37,24 @@ import plow.ui.EditingCell;
  */
 public class MainController implements Initializable {
 
-	@FXML
-	private ListView<Playlist> playlistsView;
+	@FXML private ListView<Playlist> playlistsView;
 
-	@FXML
-	private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
+	@FXML private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
 
-	@FXML
-	private TableView<Track> tracksTable;
+	@FXML private TableView<Track> tracksTable;
 
 	private ObservableList<Playlist> playlists;
 
 	@Override
-	public void initialize(URL location, ResourceBundle resources) {
+	public void initialize(final URL location, final ResourceBundle resources) {
 		playlistsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		playlistsView.getSelectionModel().selectedItemProperty().addListener(playlistChangeListener);
+		playlistsView.getSelectionModel().selectedItemProperty()
+				.addListener(playlistChangeListener);
 
 		titleColumn.setCellValueFactory(new TrackId3TagValueFactory(FieldKey.TITLE));
 		artistColumn.setCellValueFactory(new TrackId3TagValueFactory(FieldKey.ARTIST));
-		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("filenameWithPrefix"));
+		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>(
+				"filenameWithPrefix"));
 
 		// make the Table editable, by placing TextFields in the Cells
 		titleColumn.setCellFactory(EditingCell.<Track> getCellFactory());
@@ -64,7 +64,7 @@ public class MainController implements Initializable {
 
 		// Display a spinner as placeholder while the playlists load
 		playlistsView.setPlaceholder(null);
-		ProgressIndicator spinner = new ProgressIndicator();
+		final ProgressIndicator spinner = new ProgressIndicator();
 		spinner.setMaxHeight(50);
 		tracksTable.setPlaceholder(spinner);
 
@@ -73,10 +73,13 @@ public class MainController implements Initializable {
 	}
 
 	private void initializeModels() {
-		Settings settings = new ArgumentSettings();
+		final Settings settings = new ArgumentSettings();
+		lib = new MusicLibrary();
+		lib.setLibrary(settings.getLibraryPath());
+		lib.setTraktorLibrary(settings.getTraktorLibraryPath());
 
 		// TODO: Init Traktor stuff in background
-		TraktorLibraryWriter tw = new TraktorLibraryWriter();
+		final TraktorLibraryWriter tw = new TraktorLibraryWriter();
 		tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
 
 		// Scan the Library path and load all tracks and playlists
@@ -86,7 +89,8 @@ public class MainController implements Initializable {
 	private final ChangeListener<Playlist> playlistChangeListener = new ChangeListener<Playlist>() {
 
 		@Override
-		public void changed(ObservableValue<? extends Playlist> observable, Playlist old, Playlist selected) {
+		public void changed(final ObservableValue<? extends Playlist> observable,
+				final Playlist old, final Playlist selected) {
 			tracksTable.setPlaceholder(new Label("No tracks in \"" + selected.getName() + "\"."));
 			tracksTable.setItems(selected.getTracks());
 
@@ -98,19 +102,22 @@ public class MainController implements Initializable {
 
 	};
 
+	private MusicLibrary lib;
+
 	private class LoadPlaylistsTask extends Task<ObservableList<Playlist>> {
 
-		private String path;
+		private final String path;
 
-		public LoadPlaylistsTask(String path) {
+		public LoadPlaylistsTask(final String path) {
 			super();
 			this.path = path;
 		}
 
 		@Override
 		protected ObservableList<Playlist> call() throws Exception {
-			DirectoryScanner ds = new DirectoryScanner();
-			return FXCollections.observableArrayList(ds.scanDirectory(path));
+			final DirectoryScanner ds = new DirectoryScanner();
+			ds.synchronizeLibrary(lib);
+			return FXCollections.observableArrayList(lib.getPlaylists().values());
 		}
 
 		@Override

@@ -5,12 +5,11 @@ import java.util.HashMap;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import plow.model.Playlist;
 import plow.model.Track;
 
-public class Collection {
+public class MusicLibrary {
 
 	private final ObservableMap<String, Track> tracks = FXCollections
 			.observableMap(new HashMap<String, Track>());
@@ -18,13 +17,14 @@ public class Collection {
 	private final StringProperty library = new SimpleStringProperty();
 	private final StringProperty traktorLibrary = new SimpleStringProperty();
 
-	private final ObservableList<Playlist> playlists = FXCollections.observableArrayList();
+	private final ObservableMap<String, Playlist> playlists = FXCollections
+			.observableMap(new HashMap<String, Playlist>());
 
 	public ObservableMap<String, Track> getTracks() {
 		return tracks;
 	}
 
-	public ObservableList<Playlist> getPlaylists() {
+	public ObservableMap<String, Playlist> getPlaylists() {
 		return playlists;
 	}
 
@@ -50,6 +50,10 @@ public class Collection {
 
 	public String getTraktorLibrary() {
 		return traktorLibrary.getValue();
+	}
+
+	public void addTrack(final Track t) {
+		tracks.put(t.getFilenameWithPrefix(), t);
 	}
 
 }
