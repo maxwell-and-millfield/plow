@@ -16,6 +16,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import org.jaudiotagger.tag.FieldKey;
 
@@ -27,7 +28,6 @@ import plow.model.Playlist;
 import plow.model.Settings;
 import plow.model.Track;
 import plow.model.TrackId3TagValueFactory;
-import plow.ui.EditingCell;
 
 /**
  * The Main Controller. It initializes the Models and Views for Main.fxml.
@@ -36,11 +36,14 @@ import plow.ui.EditingCell;
  */
 public class MainController implements Initializable {
 
-	@FXML private ListView<Playlist> playlistsView;
+	@FXML
+	private ListView<Playlist> playlistsView;
 
-	@FXML private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
+	@FXML
+	private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
 
-	@FXML private TableView<Track> tracksTable;
+	@FXML
+	private TableView<Track> tracksTable;
 
 	private ObservableList<Playlist> playlists;
 
@@ -54,8 +57,8 @@ public class MainController implements Initializable {
 		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("filenameWithPrefix"));
 
 		// make the Table editable, by placing TextFields in the Cells
-		titleColumn.setCellFactory(EditingCell.<Track> getCellFactory());
-		artistColumn.setCellFactory(EditingCell.<Track> getCellFactory());
+		titleColumn.setCellFactory(TextFieldTableCell.<Track> forTableColumn());
+		artistColumn.setCellFactory(TextFieldTableCell.<Track> forTableColumn());
 
 		tracksTable.getSortOrder().add(titleColumn);
 
