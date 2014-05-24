@@ -79,7 +79,7 @@ public class MainController implements Initializable {
 		// TODO: Init Traktor stuff in background
 		final TraktorLibraryWriter tw = new TraktorLibraryWriter();
 		tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
-		new Thread(new LoadPlaylistsTask(settings.getLibraryPath())).start();
+		new Thread(new LoadPlaylistsTask()).start();
 	}
 
 	private final ChangeListener<Playlist> playlistChangeListener = new ChangeListener<Playlist>() {
@@ -101,21 +101,13 @@ public class MainController implements Initializable {
 
 	private MusicLibrary lib;
 
-	private class LoadPlaylistsTask extends Task<ObservableList<Playlist>> {
-
-		private final String path;
-
-		public LoadPlaylistsTask(final String path) {
-			super();
-			this.path = path;
-		}
+	private class LoadPlaylistsTask extends Task<Boolean> {
 
 		@Override
-		protected ObservableList<Playlist> call() throws Exception {
+		protected Boolean call() throws Exception {
 			final DirectoryScanner ds = new DirectoryScanner();
 			ds.synchronizeLibrary(lib);
-			return null;
-			// return FXCollections.observableArrayList(lib.getPlaylists());
+			return true;
 		}
 
 		@Override

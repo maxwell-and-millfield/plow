@@ -31,7 +31,6 @@ public class DirectoryScanner {
 		Playlist potentialPlaylist = null;
 		for (final File f : folder.listFiles()) {
 			final String filenameWithPrefix = ((prefix != "") ? prefix + "/" : "") + f.getName();
-			System.out.println(filenameWithPrefix);
 			if (f.isDirectory()) {
 				readAndSynchronize(lib, f, filenameWithPrefix);
 			} else if (isTrackFile(f)) {
