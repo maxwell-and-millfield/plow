@@ -17,6 +17,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import org.jaudiotagger.tag.FieldKey;
 
@@ -27,7 +28,6 @@ import plow.model.Playlist;
 import plow.model.Settings;
 import plow.model.Track;
 import plow.model.TrackId3TagValueFactory;
-import plow.ui.EditingCell;
 
 /**
  * The Main Controller. It initializes the Models and Views for Main.fxml.
@@ -48,7 +48,7 @@ public class MainController implements Initializable {
 	private ObservableList<Playlist> playlists;
 
 	@Override
-	public void initialize(URL location, ResourceBundle resources) {
+	public void initialize(final URL location, final ResourceBundle resources) {
 		playlistsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		playlistsView.getSelectionModel().selectedItemProperty().addListener(playlistChangeListener);
 
@@ -57,14 +57,14 @@ public class MainController implements Initializable {
 		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("filenameWithPrefix"));
 
 		// make the Table editable, by placing TextFields in the Cells
-		titleColumn.setCellFactory(EditingCell.<Track> getCellFactory());
-		artistColumn.setCellFactory(EditingCell.<Track> getCellFactory());
+		titleColumn.setCellFactory(TextFieldTableCell.<Track> forTableColumn());
+		artistColumn.setCellFactory(TextFieldTableCell.<Track> forTableColumn());
 
 		tracksTable.getSortOrder().add(titleColumn);
 
 		// Display a spinner as placeholder while the playlists load
 		playlistsView.setPlaceholder(null);
-		ProgressIndicator spinner = new ProgressIndicator();
+		final ProgressIndicator spinner = new ProgressIndicator();
 		spinner.setMaxHeight(50);
 		tracksTable.setPlaceholder(spinner);
 
@@ -73,10 +73,10 @@ public class MainController implements Initializable {
 	}
 
 	private void initializeModels() {
-		Settings settings = new ArgumentSettings();
+		final Settings settings = new ArgumentSettings();
 
 		// TODO: Init Traktor stuff in background
-		TraktorLibraryWriter tw = new TraktorLibraryWriter();
+		final TraktorLibraryWriter tw = new TraktorLibraryWriter();
 		tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
 
 		// Scan the Library path and load all tracks and playlists
@@ -86,7 +86,8 @@ public class MainController implements Initializable {
 	private final ChangeListener<Playlist> playlistChangeListener = new ChangeListener<Playlist>() {
 
 		@Override
-		public void changed(ObservableValue<? extends Playlist> observable, Playlist old, Playlist selected) {
+		public void changed(final ObservableValue<? extends Playlist> observable, final Playlist old,
+				final Playlist selected) {
 			tracksTable.setPlaceholder(new Label("No tracks in \"" + selected.getName() + "\"."));
 			tracksTable.setItems(selected.getTracks());
 
@@ -100,16 +101,16 @@ public class MainController implements Initializable {
 
 	private class LoadPlaylistsTask extends Task<ObservableList<Playlist>> {
 
-		private String path;
+		private final String path;
 
-		public LoadPlaylistsTask(String path) {
+		public LoadPlaylistsTask(final String path) {
 			super();
 			this.path = path;
 		}
 
 		@Override
 		protected ObservableList<Playlist> call() throws Exception {
-			DirectoryScanner ds = new DirectoryScanner();
+			final DirectoryScanner ds = new DirectoryScanner();
 			return FXCollections.observableArrayList(ds.scanDirectory(path));
 		}
 

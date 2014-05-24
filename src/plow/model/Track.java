@@ -4,17 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
 public class Track {
 
-	private AudioFile file;
+	private final AudioFile file;
 
-	private Tag tag;
-	private Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
+	private final Tag tag;
+	private final Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
 
 	/**
 	 * a prefix displayed before the filename. Good prefixes can be playlist
@@ -22,7 +25,7 @@ public class Track {
 	 */
 	private String filenamePrefix = "";
 
-	public Track(AudioFile file) {
+	public Track(final AudioFile file) {
 		this.file = file;
 		this.tag = file.getTag();
 	}
@@ -35,6 +38,7 @@ public class Track {
 
 			if (property == null) {
 				property = new Id3TagProperty(tag, key);
+				property.addListener(onTagChangedListener);
 				tagProperties.put(key, property);
 			}
 
@@ -42,12 +46,12 @@ public class Track {
 		}
 	}
 
-	public String getId3TagValue(FieldKey key) {
-		SimpleStringProperty property = getId3TagProperty(key);
+	public String getId3TagValue(final FieldKey key) {
+		final SimpleStringProperty property = getId3TagProperty(key);
 		return property == null ? null : property.get();
 	}
 
-	public void setId3TagValue(FieldKey key, String value) {
+	public void setId3TagValue(final FieldKey key, final String value) {
 		getId3TagProperty(key).set(value);
 	}
 
@@ -89,5 +93,19 @@ public class Track {
 
 		this.filenamePrefix = filenamePrefix;
 	}
+
+	private final ChangeListener<String> onTagChangedListener = new ChangeListener<String>() {
+		@Override
+		public void changed(final ObservableValue<? extends String> observable, final String oldValue,
+				final String newValue) {
+			// Update the file, when ID3 fields are changed
+			try {
+				file.commit();
+			} catch (final CannotWriteException e) {
+				// TODO: Display error?
+				e.printStackTrace();
+			}
+		}
+	};
 
 }
