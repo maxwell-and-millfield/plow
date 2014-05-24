@@ -29,7 +29,6 @@ public class DirectoryScanner {
 
 	public void readAndSynchronize(final MusicLibrary lib, final File folder, final String prefix) {
 		Playlist potentialPlaylist = null;
-		System.out.println(prefix);
 		for (final File f : folder.listFiles()) {
 			final String filenameWithPrefix = ((prefix != "") ? prefix + "/" : "") + f.getName();
 			if (f.isDirectory()) {
