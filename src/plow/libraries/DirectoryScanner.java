@@ -2,10 +2,10 @@ package plow.libraries;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+
+import javafx.application.Platform;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -31,6 +31,7 @@ public class DirectoryScanner {
 		Playlist potentialPlaylist = null;
 		for (final File f : folder.listFiles()) {
 			final String filenameWithPrefix = ((prefix != "") ? prefix + "/" : "") + f.getName();
+			System.out.println(filenameWithPrefix);
 			if (f.isDirectory()) {
 				readAndSynchronize(lib, f, filenameWithPrefix);
 			} else if (isTrackFile(f)) {
@@ -38,7 +39,7 @@ public class DirectoryScanner {
 					final Track t = getTrack(f, prefix);
 					lib.addTrack(t);
 					if (potentialPlaylist == null) {
-						for (final Playlist p : lib.getPlaylists().values()) {
+						for (final Playlist p : lib.getPlaylists()) {
 							if (p.getName() == prefix) {
 								potentialPlaylist = p;
 							}
@@ -47,9 +48,15 @@ public class DirectoryScanner {
 					if (potentialPlaylist == null) {
 						potentialPlaylist = new Playlist();
 						potentialPlaylist.setName(prefix);
-						final SecureRandom sr = new SecureRandom();
-						lib.getPlaylists().put(new BigInteger(130, sr).toString(36),
-								potentialPlaylist);
+						final Playlist addToPlaylist = potentialPlaylist;
+						Platform.runLater(new Runnable() {
+
+							@Override
+							public void run() {
+								lib.getPlaylists().add(addToPlaylist);
+							}
+						});
+
 					}
 					potentialPlaylist.getTracks().add(t);
 				}
@@ -87,8 +94,7 @@ public class DirectoryScanner {
 
 		try {
 			audioFile = AudioFileIO.read(file);
-		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException
-				| InvalidAudioFrameException e) {
+		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
 			e.printStackTrace();
 		}
 

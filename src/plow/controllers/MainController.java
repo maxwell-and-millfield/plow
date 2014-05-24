@@ -5,7 +5,6 @@ import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -48,13 +47,11 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(final URL location, final ResourceBundle resources) {
 		playlistsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		playlistsView.getSelectionModel().selectedItemProperty()
-				.addListener(playlistChangeListener);
+		playlistsView.getSelectionModel().selectedItemProperty().addListener(playlistChangeListener);
 
 		titleColumn.setCellValueFactory(new TrackId3TagValueFactory(FieldKey.TITLE));
 		artistColumn.setCellValueFactory(new TrackId3TagValueFactory(FieldKey.ARTIST));
-		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>(
-				"filenameWithPrefix"));
+		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("filenameWithPrefix"));
 
 		// make the Table editable, by placing TextFields in the Cells
 		titleColumn.setCellFactory(EditingCell.<Track> getCellFactory());
@@ -62,12 +59,13 @@ public class MainController implements Initializable {
 
 		tracksTable.getSortOrder().add(titleColumn);
 
+		playlistsView.setPlaceholder(new Label("No playlists found."));
+
 		// Display a spinner as placeholder while the playlists load
 		playlistsView.setPlaceholder(null);
 		final ProgressIndicator spinner = new ProgressIndicator();
 		spinner.setMaxHeight(50);
 		tracksTable.setPlaceholder(spinner);
-
 		// Load the playlists!
 		initializeModels();
 	}
@@ -77,21 +75,20 @@ public class MainController implements Initializable {
 		lib = new MusicLibrary();
 		lib.setLibrary(settings.getLibraryPath());
 		lib.setTraktorLibrary(settings.getTraktorLibraryPath());
-
+		playlistsView.setItems(lib.getPlaylists());
 		// TODO: Init Traktor stuff in background
 		final TraktorLibraryWriter tw = new TraktorLibraryWriter();
 		tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
-
-		// Scan the Library path and load all tracks and playlists
 		new Thread(new LoadPlaylistsTask(settings.getLibraryPath())).start();
 	}
 
 	private final ChangeListener<Playlist> playlistChangeListener = new ChangeListener<Playlist>() {
 
 		@Override
-		public void changed(final ObservableValue<? extends Playlist> observable,
-				final Playlist old, final Playlist selected) {
-			tracksTable.setPlaceholder(new Label("No tracks in \"" + selected.getName() + "\"."));
+		public void changed(final ObservableValue<? extends Playlist> observable, final Playlist old,
+				final Playlist selected) { //
+			tracksTable.setPlaceholder(new Label("No tracks in \"" + //
+					selected.getName() + "\".")); //
 			tracksTable.setItems(selected.getTracks());
 
 			// manually sort the table, elsewise the rows are unsorted even
@@ -117,20 +114,17 @@ public class MainController implements Initializable {
 		protected ObservableList<Playlist> call() throws Exception {
 			final DirectoryScanner ds = new DirectoryScanner();
 			ds.synchronizeLibrary(lib);
-			return FXCollections.observableArrayList(lib.getPlaylists().values());
+			return null;
+			// return FXCollections.observableArrayList(lib.getPlaylists());
 		}
 
 		@Override
 		protected void succeeded() {
-			playlists = getValue();
-
-			playlistsView.setItems(playlists);
-			playlistsView.setPlaceholder(new Label("No playlists found."));
-
-			if (!playlists.isEmpty()) {
-				// display the first playlist if possible
+			// select the first element if possible
+			if (!playlistsView.getItems().isEmpty() && playlistsView.getSelectionModel().isEmpty()) {
 				playlistsView.getSelectionModel().select(0);
 			}
+
 		}
 	};
 

@@ -34,8 +34,7 @@ public class LibraryWriter implements JsonDeserializer<MusicLibrary>, JsonSerial
 	}
 
 	@Override
-	public JsonElement serialize(final Playlist playlist, final Type type,
-			final JsonSerializationContext context) {
+	public JsonElement serialize(final Playlist playlist, final Type type, final JsonSerializationContext context) {
 		final JsonObject res = new JsonObject();
 		res.add("name", context.serialize(playlist.getName()));
 		final JsonArray tracks = new JsonArray();
@@ -47,8 +46,8 @@ public class LibraryWriter implements JsonDeserializer<MusicLibrary>, JsonSerial
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public MusicLibrary deserialize(final JsonElement element, final Type type,
-			final JsonDeserializationContext context) throws JsonParseException {
+	public MusicLibrary deserialize(final JsonElement element, final Type type, final JsonDeserializationContext context)
+			throws JsonParseException {
 		if (element instanceof JsonObject) {
 			final JsonObject object = (JsonObject) element;
 			final MusicLibrary result = new MusicLibrary();
@@ -58,10 +57,8 @@ public class LibraryWriter implements JsonDeserializer<MusicLibrary>, JsonSerial
 			tracks = context.deserialize(object.get("tracks"), tracks.getClass());
 			result.getTracks().putAll((java.util.Map<? extends String, ? extends Track>) tracks);
 			if (object.has("playlists")) {
-				for (final Entry<String, JsonElement> entry : object.get("playlists")
-						.getAsJsonObject().entrySet()) {
-					result.getPlaylists().put(entry.getKey(),
-							deserializePlaylist(result, (JsonObject) entry.getValue()));
+				for (final Entry<String, JsonElement> entry : object.get("playlists").getAsJsonObject().entrySet()) {
+					result.getPlaylists().add(deserializePlaylist(result, (JsonObject) entry.getValue()));
 				}
 			}
 		}
@@ -71,6 +68,7 @@ public class LibraryWriter implements JsonDeserializer<MusicLibrary>, JsonSerial
 	protected Playlist deserializePlaylist(final MusicLibrary library, final JsonObject object) {
 		final Playlist playlist = new Playlist();
 		playlist.setName(object.get("name").getAsString());
+		playlist.setId(object.get("id").getAsString());
 		for (final JsonElement element : object.get("tracks").getAsJsonArray()) {
 			if (library.getTracks().containsKey(element.getAsString())) {
 				playlist.getTracks().add(library.getTracks().get(element.getAsString()));
