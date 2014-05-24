@@ -17,6 +17,7 @@ public class Track {
 	private final AudioFile file;
 
 	private final Tag tag;
+	private long lastModified;
 	private final Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
 
 	/**
@@ -92,6 +93,14 @@ public class Track {
 		}
 
 		this.filenamePrefix = filenamePrefix;
+	}
+
+	public long getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(final long lastModified) {
+		this.lastModified = lastModified;
 	}
 
 	private final ChangeListener<String> onTagChangedListener = new ChangeListener<String>() {
