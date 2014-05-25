@@ -1,9 +1,13 @@
 package plow.libraries.serializer;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Map.Entry;
 
+import org.jaudiotagger.tag.FieldKey;
+
 import plow.libraries.MusicLibrary;
+import plow.model.Id3TagProperty;
 import plow.model.Playlist;
 import plow.model.Track;
 
@@ -25,10 +29,17 @@ public class MusicLibraryDeserializer implements JsonDeserializer<MusicLibrary> 
 			result.setLibrary(object.get("library").getAsString());
 			result.setTraktorLibrary(object.get("traktorLibrary").getAsString());
 			for (final Entry<String, JsonElement> e : object.get("tracks").getAsJsonObject().entrySet()) {
-				result.getTracks().put(
-						e.getKey(),
-						new Track(result, e.getValue().getAsJsonObject().get("filenamePrefix").getAsString(), e
-								.getKey()));
+				final JsonObject obj = e.getValue().getAsJsonObject();
+				final Track t = new Track(result, obj.get("filenamePrefix").getAsString(),
+						new File(e.getKey()).getName());
+				t.setLastModified(obj.get("lastModified").getAsLong());
+				if (obj.has("tags")) {
+					for (final Entry<String, JsonElement> tag : obj.get("tags").getAsJsonObject().entrySet()) {
+						t.getTagProperties().put(FieldKey.valueOf(tag.getKey()),
+								new Id3TagProperty(t, FieldKey.valueOf(tag.getKey()), tag.getValue().getAsString()));
+					}
+				}
+				result.getTracks().put(e.getKey(), t);
 			}
 			if (object.has("playlists")) {
 				for (final JsonElement e : object.get("playlists").getAsJsonArray()) {

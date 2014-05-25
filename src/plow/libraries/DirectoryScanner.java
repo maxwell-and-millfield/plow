@@ -1,19 +1,10 @@
 package plow.libraries;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javafx.application.Platform;
 
 import org.eclipse.core.runtime.Path;
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
 
 import plow.model.Playlist;
 import plow.model.Track;
@@ -36,7 +27,7 @@ public class DirectoryScanner {
 				readAndSynchronize(lib, f, filenameWithPrefix);
 			} else if (isTrackFile(f)) {
 				if (!lib.getTracks().containsKey(filenameWithPrefix)) {
-					final Track t = getTrack(f, prefix);
+					final Track t = new Track(lib, prefix + Path.SEPARATOR, f.getName());
 					lib.addTrack(t);
 					if (potentialPlaylist == null) {
 						for (final Playlist p : lib.getPlaylists()) {
@@ -60,48 +51,16 @@ public class DirectoryScanner {
 					System.out.println("Added " + filenameWithPrefix);
 					potentialPlaylist.getTracks().add(t);
 				}
+				final Track track = lib.getTracks().get(filenameWithPrefix);
+				if (track.getLastModified() != f.lastModified()) {
+					System.out.println(track.getLastModified() + " != " + f.lastModified());
+					System.out.println("Updated: " + f.getName());
+					track.updateTags();
+					track.setLastModified(f.lastModified());
+				}
+				track.setLastModified(f.lastModified());
 			}
 		}
-	}
-
-	public List<Playlist> scanDirectory(final String dir) {
-		final File folder = new File(dir);
-		if (!folder.isDirectory()) {
-			throw new RuntimeException("Not a valid library directory");
-		}
-		final ArrayList<Playlist> playlists = new ArrayList<>();
-		for (final File f : folder.listFiles()) {
-			if (f.isDirectory()) {
-				playlists.add(getPlaylist(f));
-			}
-		}
-		return playlists;
-	}
-
-	private Playlist getPlaylist(final File folder) {
-		final Playlist p = new Playlist();
-		p.setName(folder.getName());
-		for (final File f : folder.listFiles()) {
-			if (!f.isDirectory() && isTrackFile(f)) {
-				p.getTracks().add(getTrack(f, folder.getName()));
-			}
-		}
-		return p;
-	}
-
-	private Track getTrack(final File file, final String prefix) {
-		AudioFile audioFile = null;
-
-		try {
-			audioFile = AudioFileIO.read(file);
-		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-			e.printStackTrace();
-		}
-
-		final Track track = new Track(audioFile);
-		// prefix the file name with the folder name and a slash
-		track.setFilenamePrefix(prefix + Path.SEPARATOR);
-		return track;
 	}
 
 	private boolean isTrackFile(final File file) {

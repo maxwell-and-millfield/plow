@@ -11,7 +11,9 @@ import javafx.beans.property.StringProperty;
 import plow.libraries.serializer.MusicLibraryDeserializer;
 import plow.libraries.serializer.PlaylistSerializer;
 import plow.libraries.serializer.StringPropertySerializer;
+import plow.libraries.serializer.TrackSerializer;
 import plow.model.Playlist;
+import plow.model.Track;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,6 +27,7 @@ public class LibraryWriter {
 		builder.registerTypeAdapter(MusicLibrary.class, new MusicLibraryDeserializer());
 		builder.registerTypeAdapter(Playlist.class, new PlaylistSerializer());
 		builder.registerTypeAdapter(StringProperty.class, new StringPropertySerializer());
+		builder.registerTypeAdapter(Track.class, new TrackSerializer());
 		gson = builder.create();
 	}
 

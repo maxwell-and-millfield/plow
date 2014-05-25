@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.Path;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
@@ -26,8 +25,7 @@ import plow.libraries.MusicLibrary;
 
 public class Track {
 
-	private transient AudioFile file;
-
+	private transient String filename;
 	private transient Tag tag;
 	private long lastModified;
 	private transient final Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
@@ -41,21 +39,9 @@ public class Track {
 
 	private transient MusicLibrary lib;
 
-	public Track(final AudioFile file) {
-		this.file = file;
-		this.tag = file.getTag();
-	}
-
 	public Track(final MusicLibrary lib, final String prefix, final String fileName) {
 		this.lib = lib;
-		try {
-			file = new AudioFileIO().readFile(new File(lib.getLibrary() + Path.SEPARATOR + fileName));
-			tag = file.getTag();
-		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-			file = null;
-			fileExists.set(false);
-			tag = null;
-		}
+		this.filename = fileName;
 		this.filenamePrefix = prefix;
 	}
 
@@ -63,14 +49,13 @@ public class Track {
 		if (key == null) {
 			throw new NullPointerException();
 		} else {
-			Id3TagProperty property = tagProperties.get(key);
+			Id3TagProperty property = getTagProperties().get(key);
 
 			if (property == null) {
-				property = new Id3TagProperty(tag, key);
+				property = new Id3TagProperty(this, key);
 				property.addListener(onTagChangedListener);
-				tagProperties.put(key, property);
+				getTagProperties().put(key, property);
 			}
-
 			return property;
 		}
 	}
@@ -85,7 +70,7 @@ public class Track {
 	}
 
 	public String getFilename() {
-		return file.getFile().getName();
+		return filename;
 	}
 
 	/**
@@ -95,7 +80,7 @@ public class Track {
 	 *         "Deep House/Sleepless.mp3"
 	 */
 	public String getFilenameWithPrefix() {
-		return filenamePrefix + file.getFile().getName();
+		return filenamePrefix + filename;
 	}
 
 	/**
@@ -136,13 +121,36 @@ public class Track {
 		public void changed(final ObservableValue<? extends String> observable, final String oldValue,
 				final String newValue) {
 			// Update the file, when ID3 fields are changed
-			try {
-				file.commit();
-			} catch (final CannotWriteException e) {
-				// TODO: Display error?
-				e.printStackTrace();
-			}
+			/*
+			 * try { file.commit(); } catch (final CannotWriteException e) { //
+			 * TODO: Display error? e.printStackTrace(); }
+			 */// TODO: write to audiofile again
 		}
 	};
+
+	public Tag getTag() {
+		if (tag == null) {
+			try {
+				final AudioFile file = new AudioFileIO().readFile(new File(lib.getLibrary() + Path.SEPARATOR
+						+ filenamePrefix + filename));
+				tag = file.getTag();
+			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException
+					| InvalidAudioFrameException e) {
+				fileExists.set(false);
+				tag = null;
+			}
+		}
+		return tag;
+	}
+
+	public Map<FieldKey, Id3TagProperty> getTagProperties() {
+		return tagProperties;
+	}
+
+	public void updateTags() {
+		for (final Id3TagProperty p : tagProperties.values()) {
+			p.update();
+		}
+	}
 
 }
