@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import plow.controllers.PlowController;
 
 /**
  * The Main Class.
@@ -21,9 +22,13 @@ public class Main extends Application {
 	public void start(final Stage primaryStage) throws IOException {
 		primaryStage.setTitle("Plow");
 		// plow/ui/Main.fxml contains the Main layout
-		final Parent parent = (Parent) FXMLLoader.load(getClass().getResource("Main.fxml"));
-		primaryStage.setScene(new Scene(parent));
+		final FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
+		final Scene scene = new Scene((Parent) loader.load());
+
+		primaryStage.setScene(scene);
+		((PlowController) loader.getController()).setScene(scene);
 		primaryStage.show();
+
 	}
 
 	/**

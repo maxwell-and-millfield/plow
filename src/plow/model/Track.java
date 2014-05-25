@@ -11,11 +11,11 @@ import org.jaudiotagger.tag.Tag;
 
 public class Track {
 
-	private final AudioFile file;
+	private transient final AudioFile file;
 
-	private final Tag tag;
+	private transient final Tag tag;
 	private long lastModified;
-	private final Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
+	private transient final Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
 
 	/**
 	 * a prefix displayed before the filename. Good prefixes can be playlist

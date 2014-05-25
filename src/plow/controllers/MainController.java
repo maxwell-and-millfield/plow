@@ -1,14 +1,16 @@
 package plow.controllers;
 
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
@@ -16,10 +18,12 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.WindowEvent;
 
 import org.jaudiotagger.tag.FieldKey;
 
 import plow.libraries.DirectoryScanner;
+import plow.libraries.LibraryWriter;
 import plow.libraries.MusicLibrary;
 import plow.libraries.TraktorLibraryWriter;
 import plow.model.ArgumentSettings;
@@ -34,7 +38,7 @@ import plow.ui.EditingCell;
  * 
  * @author Maxwell & Millfield
  */
-public class MainController implements Initializable {
+public class MainController extends PlowController implements Initializable {
 
 	@FXML private ListView<Playlist> playlistsView;
 
@@ -42,7 +46,7 @@ public class MainController implements Initializable {
 
 	@FXML private TableView<Track> tracksTable;
 
-	private ObservableList<Playlist> playlists;
+	private final LibraryWriter libWriter = new LibraryWriter();
 
 	@Override
 	public void initialize(final URL location, final ResourceBundle resources) {
@@ -120,4 +124,23 @@ public class MainController implements Initializable {
 		}
 	};
 
+	public void close() {
+		playlistsView.getScene().getWindow().hide();
+	}
+
+	public void saveMusicLibrary() {
+		libWriter.save(lib, Paths.get("library.plow"));
+	}
+
+	@Override
+	public void setScene(final Scene scene) {
+		super.setScene(scene);
+		scene.getWindow().setOnHiding(new EventHandler<WindowEvent>() {
+
+			@Override
+			public void handle(final WindowEvent event) {
+				System.out.println("hidde,");
+			}
+		});
+	}
 }

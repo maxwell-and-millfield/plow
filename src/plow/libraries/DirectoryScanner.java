@@ -49,7 +49,6 @@ public class DirectoryScanner {
 						potentialPlaylist.setName(prefix);
 						final Playlist addToPlaylist = potentialPlaylist;
 						Platform.runLater(new Runnable() {
-
 							@Override
 							public void run() {
 								lib.getPlaylists().add(addToPlaylist);

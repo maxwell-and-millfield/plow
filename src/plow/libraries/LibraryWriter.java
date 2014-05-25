@@ -1,9 +1,15 @@
 package plow.libraries;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map.Entry;
 
+import javafx.beans.property.StringProperty;
+import plow.libraries.serializer.StringPropertySerializer;
 import plow.model.Playlist;
 import plow.model.Track;
 
@@ -21,16 +27,23 @@ import com.sun.javafx.collections.MappingChange.Map;
 
 public class LibraryWriter implements JsonDeserializer<MusicLibrary>, JsonSerializer<Playlist> {
 
-	private Gson gson;
+	private final Gson gson;
 
 	public LibraryWriter() {
 		final GsonBuilder builder = new GsonBuilder();
-		builder.registerTypeAdapter(MusicLibrary.class, this);
+		// builder.registerTypeAdapter(MusicLibrary.class, this);
 		builder.registerTypeAdapter(Playlist.class, this);
+		builder.registerTypeAdapter(StringProperty.class, new StringPropertySerializer());
+		gson = builder.create();
 	}
 
 	public void save(final MusicLibrary c, final Path f) {
-		System.out.println(gson.toJson(c));
+		final String s = gson.toJson(c);
+		try (BufferedWriter writer = Files.newBufferedWriter(f, Charset.forName("UTF-8"))) {
+			writer.write(s, 0, s.length());
+		} catch (final IOException x) {
+			System.err.format("IOException: %s%n", x);
+		}
 	}
 
 	@Override
@@ -41,6 +54,7 @@ public class LibraryWriter implements JsonDeserializer<MusicLibrary>, JsonSerial
 		for (final Track t : playlist.getTracks()) {
 			tracks.add(context.serialize(t.getFilenameWithPrefix()));
 		}
+		res.add("tracks", tracks);
 		return res;
 	}
 
