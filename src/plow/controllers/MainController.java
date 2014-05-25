@@ -72,9 +72,9 @@ public class MainController extends PlowController {
 
 	private void initializeModels() {
 		final Settings settings = new ArgumentSettings();
-		lib = new MusicLibrary();
-		lib.setLibrary(settings.getLibraryPath());
-		lib.setTraktorLibrary(settings.getTraktorLibraryPath());
+		lib = libWriter.load(Paths.get("library.plow"));
+		// lib.setLibrary(settings.getLibraryPath());
+		// lib.setTraktorLibrary(settings.getTraktorLibraryPath());
 		playlistsView.setItems(lib.getPlaylists());
 		// TODO: Init Traktor stuff in background
 		final TraktorLibraryWriter tw = new TraktorLibraryWriter();

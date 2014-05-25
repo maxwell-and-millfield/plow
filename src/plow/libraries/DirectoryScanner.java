@@ -7,6 +7,7 @@ import java.util.List;
 
 import javafx.application.Platform;
 
+import org.eclipse.core.runtime.Path;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -30,7 +31,7 @@ public class DirectoryScanner {
 	public void readAndSynchronize(final MusicLibrary lib, final File folder, final String prefix) {
 		Playlist potentialPlaylist = null;
 		for (final File f : folder.listFiles()) {
-			final String filenameWithPrefix = ((prefix != "") ? prefix + "/" : "") + f.getName();
+			final String filenameWithPrefix = ((prefix != "") ? prefix + Path.SEPARATOR : "") + f.getName();
 			if (f.isDirectory()) {
 				readAndSynchronize(lib, f, filenameWithPrefix);
 			} else if (isTrackFile(f)) {
@@ -39,7 +40,7 @@ public class DirectoryScanner {
 					lib.addTrack(t);
 					if (potentialPlaylist == null) {
 						for (final Playlist p : lib.getPlaylists()) {
-							if (p.getName() == prefix) {
+							if (p.getName().equals(prefix)) {
 								potentialPlaylist = p;
 							}
 						}
@@ -56,6 +57,7 @@ public class DirectoryScanner {
 						});
 
 					}
+					System.out.println("Added " + filenameWithPrefix);
 					potentialPlaylist.getTracks().add(t);
 				}
 			}
@@ -98,8 +100,7 @@ public class DirectoryScanner {
 
 		final Track track = new Track(audioFile);
 		// prefix the file name with the folder name and a slash
-		track.setFilenamePrefix(prefix + File.separator);
-
+		track.setFilenamePrefix(prefix + Path.SEPARATOR);
 		return track;
 	}
 

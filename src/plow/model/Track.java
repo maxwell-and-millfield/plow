@@ -1,24 +1,37 @@
 package plow.model;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
+import org.eclipse.core.runtime.Path;
 import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
+
+import plow.libraries.MusicLibrary;
 
 public class Track {
 
-	private transient final AudioFile file;
+	private transient AudioFile file;
 
-	private transient final Tag tag;
+	private transient Tag tag;
 	private long lastModified;
 	private transient final Map<FieldKey, Id3TagProperty> tagProperties = new HashMap<>();
+	private transient final BooleanProperty fileExists = new SimpleBooleanProperty(true);
 
 	/**
 	 * a prefix displayed before the filename. Good prefixes can be playlist
@@ -26,9 +39,24 @@ public class Track {
 	 */
 	private String filenamePrefix = "";
 
+	private transient MusicLibrary lib;
+
 	public Track(final AudioFile file) {
 		this.file = file;
 		this.tag = file.getTag();
+	}
+
+	public Track(final MusicLibrary lib, final String prefix, final String fileName) {
+		this.lib = lib;
+		try {
+			file = new AudioFileIO().readFile(new File(lib.getLibrary() + Path.SEPARATOR + fileName));
+			tag = file.getTag();
+		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
+			file = null;
+			fileExists.set(false);
+			tag = null;
+		}
+		this.filenamePrefix = prefix;
 	}
 
 	public Id3TagProperty getId3TagProperty(final FieldKey key) {
@@ -103,7 +131,7 @@ public class Track {
 		this.lastModified = lastModified;
 	}
 
-	private final ChangeListener<String> onTagChangedListener = new ChangeListener<String>() {
+	private transient final ChangeListener<String> onTagChangedListener = new ChangeListener<String>() {
 		@Override
 		public void changed(final ObservableValue<? extends String> observable, final String oldValue,
 				final String newValue) {

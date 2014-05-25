@@ -15,11 +15,13 @@ public class Id3TagProperty extends SimpleStringProperty {
 
 	private final FieldKey key;
 
-	public Id3TagProperty(Tag tag, FieldKey key) {
+	public Id3TagProperty(final Tag tag, final FieldKey key) {
 		this.tag = tag;
 		this.key = key;
-		this.set(tag.getFirst(key));
-		this.addListener(onChangeListener); 
+		if (tag != null) {
+			this.set(tag.getFirst(key));
+		}
+		this.addListener(onChangeListener);
 	}
 
 	public Tag getTag() {
@@ -33,10 +35,13 @@ public class Id3TagProperty extends SimpleStringProperty {
 	private final ChangeListener<String> onChangeListener = new ChangeListener<String>() {
 
 		@Override
-		public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+		public void changed(final ObservableValue<? extends String> observable, final String oldValue,
+				final String newValue) {
 			try {
-				tag.setField(key, newValue);
-				// TODO: Write Tag to File?
+				if (tag != null) {
+					tag.setField(key, newValue);
+					// TODO: Write Tag to File?
+				}
 			} catch (KeyNotFoundException | FieldDataInvalidException e) {
 				e.printStackTrace();
 			}
