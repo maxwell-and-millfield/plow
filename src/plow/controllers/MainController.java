@@ -1,15 +1,12 @@
 package plow.controllers;
 
-import java.net.URL;
 import java.nio.file.Paths;
-import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -18,6 +15,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.WindowEvent;
 
 import org.jaudiotagger.tag.FieldKey;
@@ -31,14 +29,13 @@ import plow.model.Playlist;
 import plow.model.Settings;
 import plow.model.Track;
 import plow.model.TrackId3TagValueFactory;
-import plow.ui.EditingCell;
 
 /**
  * The Main Controller. It initializes the Models and Views for Main.fxml.
  * 
  * @author Maxwell & Millfield
  */
-public class MainController extends PlowController implements Initializable {
+public class MainController extends PlowController {
 
 	@FXML private ListView<Playlist> playlistsView;
 
@@ -47,9 +44,10 @@ public class MainController extends PlowController implements Initializable {
 	@FXML private TableView<Track> tracksTable;
 
 	private final LibraryWriter libWriter = new LibraryWriter();
+	private MusicLibrary lib;
 
-	@Override
-	public void initialize(final URL location, final ResourceBundle resources) {
+	@FXML
+	public void initialize() {
 		playlistsView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		playlistsView.getSelectionModel().selectedItemProperty().addListener(playlistChangeListener);
 
@@ -58,12 +56,10 @@ public class MainController extends PlowController implements Initializable {
 		filenameColumn.setCellValueFactory(new PropertyValueFactory<Track, String>("filenameWithPrefix"));
 
 		// make the Table editable, by placing TextFields in the Cells
-		titleColumn.setCellFactory(EditingCell.<Track> getCellFactory());
-		artistColumn.setCellFactory(EditingCell.<Track> getCellFactory());
+		titleColumn.setCellFactory(TextFieldTableCell.<Track> forTableColumn());
+		artistColumn.setCellFactory(TextFieldTableCell.<Track> forTableColumn());
 
 		tracksTable.getSortOrder().add(titleColumn);
-
-		playlistsView.setPlaceholder(new Label("No playlists found."));
 
 		// Display a spinner as placeholder while the playlists load
 		playlistsView.setPlaceholder(null);
@@ -102,8 +98,6 @@ public class MainController extends PlowController implements Initializable {
 		}
 
 	};
-
-	private MusicLibrary lib;
 
 	private class LoadPlaylistsTask extends Task<Boolean> {
 

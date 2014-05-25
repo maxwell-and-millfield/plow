@@ -4,8 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
@@ -36,6 +39,7 @@ public class Track {
 
 			if (property == null) {
 				property = new Id3TagProperty(tag, key);
+				property.addListener(onTagChangedListener);
 				tagProperties.put(key, property);
 			}
 
@@ -98,5 +102,19 @@ public class Track {
 	public void setLastModified(final long lastModified) {
 		this.lastModified = lastModified;
 	}
+
+	private final ChangeListener<String> onTagChangedListener = new ChangeListener<String>() {
+		@Override
+		public void changed(final ObservableValue<? extends String> observable, final String oldValue,
+				final String newValue) {
+			// Update the file, when ID3 fields are changed
+			try {
+				file.commit();
+			} catch (final CannotWriteException e) {
+				// TODO: Display error?
+				e.printStackTrace();
+			}
+		}
+	};
 
 }
