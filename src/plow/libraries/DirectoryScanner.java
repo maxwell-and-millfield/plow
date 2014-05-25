@@ -28,6 +28,7 @@ public class DirectoryScanner {
 			} else if (isTrackFile(f)) {
 				if (!lib.getTracks().containsKey(filenameWithPrefix)) {
 					final Track t = new Track(lib, prefix + Path.SEPARATOR, f.getName());
+					t.setLastModified(f.lastModified());
 					lib.addTrack(t);
 					if (potentialPlaylist == null) {
 						for (final Playlist p : lib.getPlaylists()) {
@@ -48,17 +49,33 @@ public class DirectoryScanner {
 						});
 
 					}
+					final Playlist addToPlaylist = potentialPlaylist;
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							addToPlaylist.getTracks().add(t);
+						}
+					});
+
 					System.out.println("Added " + filenameWithPrefix);
-					potentialPlaylist.getTracks().add(t);
+
+				} else {
+					final Track track = lib.getTracks().get(filenameWithPrefix);
+
+					if (track.getLastModified() != f.lastModified()) {
+						track.setLastModified(f.lastModified());
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								System.out.println(track.getLastModified() + " != " + f.lastModified());
+								System.out.println("Updated: " + f.getName());
+								track.updateTags();
+								track.setLastModified(f.lastModified());
+							}
+						});
+					}
 				}
-				final Track track = lib.getTracks().get(filenameWithPrefix);
-				if (track.getLastModified() != f.lastModified()) {
-					System.out.println(track.getLastModified() + " != " + f.lastModified());
-					System.out.println("Updated: " + f.getName());
-					track.updateTags();
-					track.setLastModified(f.lastModified());
-				}
-				track.setLastModified(f.lastModified());
+
 			}
 		}
 	}

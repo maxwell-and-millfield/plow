@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -43,6 +44,10 @@ public class MainController extends PlowController {
 
 	@FXML private TableView<Track> tracksTable;
 
+	@FXML private Label backgroundLabel;
+
+	@FXML private ProgressIndicator backgroundIndicator;
+
 	private final LibraryWriter libWriter = new LibraryWriter();
 	private MusicLibrary lib;
 
@@ -76,10 +81,13 @@ public class MainController extends PlowController {
 		// lib.setLibrary(settings.getLibraryPath());
 		// lib.setTraktorLibrary(settings.getTraktorLibraryPath());
 		playlistsView.setItems(lib.getPlaylists());
+		if (!playlistsView.getItems().isEmpty() && playlistsView.getSelectionModel().isEmpty()) {
+			playlistsView.getSelectionModel().select(0);
+		}
 		// TODO: Init Traktor stuff in background
 		final TraktorLibraryWriter tw = new TraktorLibraryWriter();
 		tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
-		new Thread(new LoadPlaylistsTask()).start();
+		executeBackgroundTask(new LoadPlaylistsTask());
 	}
 
 	private final ChangeListener<Playlist> playlistChangeListener = new ChangeListener<Playlist>() {
@@ -103,6 +111,7 @@ public class MainController extends PlowController {
 
 		@Override
 		protected Boolean call() throws Exception {
+			updateMessage("Checking Consistency");
 			final DirectoryScanner ds = new DirectoryScanner();
 			ds.synchronizeLibrary(lib);
 			return true;
@@ -110,10 +119,6 @@ public class MainController extends PlowController {
 
 		@Override
 		protected void succeeded() {
-			// select the first element if possible
-			if (!playlistsView.getItems().isEmpty() && playlistsView.getSelectionModel().isEmpty()) {
-				playlistsView.getSelectionModel().select(0);
-			}
 
 		}
 	};
@@ -123,7 +128,17 @@ public class MainController extends PlowController {
 	}
 
 	public void saveMusicLibrary() {
-		libWriter.save(lib, Paths.get("library.plow"));
+		executeBackgroundTask(new Task<Boolean>() {
+
+			@Override
+			protected Boolean call() throws Exception {
+				updateMessage("Saving...");
+				libWriter.save(lib, Paths.get("library.plow"));
+				return true;
+			}
+
+		});
+
 	}
 
 	@Override
@@ -136,5 +151,20 @@ public class MainController extends PlowController {
 				System.out.println("hidde,");
 			}
 		});
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void executeBackgroundTask(@SuppressWarnings("rawtypes") final Task t) {
+		backgroundLabel.textProperty().bind(t.messageProperty());
+		t.stateProperty().addListener(new ChangeListener<State>() {
+			@Override
+			public void changed(final ObservableValue<? extends State> observable, final State oldValue,
+					final State newValue) {
+				backgroundIndicator.setVisible(newValue == State.RUNNING);
+				backgroundLabel.setVisible(newValue == State.RUNNING);
+			}
+
+		});
+		new Thread(t).start();
 	}
 }
