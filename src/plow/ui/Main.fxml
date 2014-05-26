@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.input.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.effect.*?>
 <?import java.lang.*?>
@@ -33,7 +34,7 @@
       		</AnchorPane>
       		<AnchorPane>
       			<children>
-      				<TableView fx:id="tracksTable" editable="true" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      				<TableView fx:id="tracksTable" editable="true" onKeyReleased="#tableKeyPressed" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       					<columns>
       						<TableColumn fx:id="titleColumn" minWidth="20.0" prefWidth="200.0" text="Title" />
       						<TableColumn fx:id="artistColumn" minWidth="20.0" prefWidth="100.0" text="Artist" />
@@ -43,6 +44,13 @@
       			</children>
       		</AnchorPane>
       	</items>
+         <contextMenu>
+            <ContextMenu fx:id="tableMenu">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#deleteFromPlaylist" text="Delete" />
+              </items>
+            </ContextMenu>
+         </contextMenu>
       </SplitPane>
       <HBox alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="200.0">
          <children>

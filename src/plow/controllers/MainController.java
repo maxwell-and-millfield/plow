@@ -13,6 +13,7 @@ import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -25,6 +26,8 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.stage.WindowEvent;
@@ -58,6 +61,8 @@ public class MainController extends PlowController {
 	@FXML private Label backgroundLabel;
 
 	@FXML private ProgressIndicator backgroundIndicator;
+
+	@FXML private ContextMenu tableMenu;
 
 	private final LibraryWriter libWriter = new LibraryWriter();
 	private MusicLibrary lib;
@@ -130,7 +135,7 @@ public class MainController extends PlowController {
 		artistColumn.setCellFactory(TextFieldTableCell.<Track> forTableColumn());
 
 		tracksTable.getSortOrder().add(titleColumn);
-
+		tracksTable.setContextMenu(tableMenu);
 		// Display a spinner as placeholder while the playlists load
 		playlistsView.setPlaceholder(null);
 		final ProgressIndicator spinner = new ProgressIndicator();
@@ -249,5 +254,15 @@ public class MainController extends PlowController {
 
 		});
 		new Thread(t).start();
+	}
+
+	public void deleteFromPlaylist() {
+		tracksTable.getItems().remove(tracksTable.getSelectionModel().getSelectedItem());
+	}
+
+	public void tableKeyPressed(final KeyEvent e) {
+		if (e.getCode() == KeyCode.DELETE) {
+			deleteFromPlaylist();
+		}
 	}
 }
