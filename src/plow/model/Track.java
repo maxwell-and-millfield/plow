@@ -149,7 +149,7 @@ public class Track {
 
 	public void updateTags() {
 		for (final Id3TagProperty p : tagProperties.values()) {
-			p.update();
+			p.updateFromTag();
 		}
 	}
 

@@ -67,7 +67,6 @@ public class DirectoryScanner {
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
-								System.out.println(track.getLastModified() + " != " + f.lastModified());
 								System.out.println("Updated: " + f.getName());
 								track.updateTags();
 								track.setLastModified(f.lastModified());

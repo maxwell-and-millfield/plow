@@ -17,7 +17,7 @@ public class Id3TagProperty extends SimpleStringProperty {
 	public Id3TagProperty(final Track track, final FieldKey key) {
 		this.track = track;
 		this.key = key;
-		update();
+		updateFromTag();
 		this.addListener(onChangeListener);
 	}
 
@@ -28,7 +28,7 @@ public class Id3TagProperty extends SimpleStringProperty {
 		this.addListener(onChangeListener);
 	}
 
-	public void update() {
+	public void updateFromTag() {
 		if (track.getTag() != null) {
 			this.set(track.getTag().getFirst(this.key));
 		}
