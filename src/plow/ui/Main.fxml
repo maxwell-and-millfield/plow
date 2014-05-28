@@ -15,6 +15,7 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
                   <MenuItem mnemonicParsing="false" onAction="#saveMusicLibrary" text="Save" />
+                  <MenuItem mnemonicParsing="false" onAction="#exportToTraktor" text="Export to Traktor" />
               <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
             </items>
           </Menu>
@@ -52,7 +53,7 @@
             </ContextMenu>
          </contextMenu>
       </SplitPane>
-      <HBox alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="200.0">
+      <HBox alignment="CENTER_RIGHT" maxHeight="25.0" minHeight="25.0" prefHeight="25.0" prefWidth="200.0">
          <children>
             <ProgressIndicator fx:id="backgroundIndicator" visible="false" />
             <Label fx:id="backgroundLabel" visible="false">

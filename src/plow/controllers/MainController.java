@@ -172,9 +172,6 @@ public class MainController extends PlowController {
 		if (!playlistsView.getItems().isEmpty() && playlistsView.getSelectionModel().isEmpty()) {
 			playlistsView.getSelectionModel().select(0);
 		}
-		// TODO: Init Traktor stuff in background
-		final TraktorLibraryWriter tw = new TraktorLibraryWriter();
-		tw.writeToTraktorLibrary(settings.getTraktorLibraryPath(), settings.getLibraryPath(), null);
 		executeBackgroundTask(new LoadPlaylistsTask());
 	}
 
@@ -194,6 +191,8 @@ public class MainController extends PlowController {
 		}
 
 	};
+
+	private final TraktorLibraryWriter tw = new TraktorLibraryWriter();;
 
 	private class LoadPlaylistsTask extends Task<Boolean> {
 
@@ -222,6 +221,20 @@ public class MainController extends PlowController {
 			protected Boolean call() throws Exception {
 				updateMessage("Saving...");
 				libWriter.save(lib, Paths.get("library.plow"));
+				return true;
+			}
+
+		});
+
+	}
+
+	public void exportToTraktor() {
+		executeBackgroundTask(new Task<Boolean>() {
+
+			@Override
+			protected Boolean call() throws Exception {
+				updateMessage("Exporting...");
+				tw.writeToTraktorLibrary(lib);
 				return true;
 			}
 
