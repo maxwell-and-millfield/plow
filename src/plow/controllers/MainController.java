@@ -234,6 +234,7 @@ public class MainController extends PlowController {
 			@Override
 			protected Boolean call() throws Exception {
 				updateMessage("Exporting...");
+				System.out.println("mhm");
 				tw.writeToTraktorLibrary(lib);
 				return true;
 			}
