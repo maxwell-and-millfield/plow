@@ -8,11 +8,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javafx.beans.property.StringProperty;
+
+import javax.inject.Inject;
+
 import plow.libraries.serializer.MusicLibraryDeserializer;
 import plow.libraries.serializer.PlaylistSerializer;
 import plow.libraries.serializer.StringPropertySerializer;
 import plow.libraries.serializer.TrackSerializer;
 import plow.model.Playlist;
+import plow.model.Settings;
 import plow.model.Track;
 
 import com.google.gson.Gson;
@@ -21,6 +25,9 @@ import com.google.gson.GsonBuilder;
 public class LibraryWriter {
 
 	private final Gson gson;
+
+	@Inject
+	private Settings settings;
 
 	public LibraryWriter() {
 		final GsonBuilder builder = new GsonBuilder();
@@ -53,18 +60,7 @@ public class LibraryWriter {
 				throw new RuntimeException(x);
 			}
 		} else {
-			final MusicLibrary lib = new MusicLibrary();
-			if (System.getProperty("library") == null) {
-				throw new RuntimeException("No path for music library folder given. "
-						+ "Usage: -Dlibrary=/path/to/music/library/");
-			} else if (System.getProperty("traktor") == null) {
-				throw new RuntimeException("No path for Traktor collection given. "
-						+ "Usage -Dtraktor=/path/to/traktor/collection.nml");
-			} else {
-				lib.setLibrary(System.getProperty("library"));
-				lib.setTraktorLibrary(System.getProperty("traktor"));
-			}
-			return lib;
+			return new MusicLibrary();
 		}
 	}
 

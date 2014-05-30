@@ -8,60 +8,76 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="plow.controllers.MainController">
-   <children>
-      <MenuBar>
-        <menus>
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-                  <MenuItem mnemonicParsing="false" onAction="#saveMusicLibrary" text="Save" />
-                  <MenuItem mnemonicParsing="false" onAction="#exportToTraktor" text="Export to Traktor" />
-              <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-      <SplitPane dividerPositions="0.3" prefHeight="600.0" prefWidth="800.0">
-      	<items>
-      		<AnchorPane SplitPane.resizableWithParent="false">
-      			<children>
-      				<ListView fx:id="playlistsView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      			</children>
-      		</AnchorPane>
-      		<AnchorPane>
-      			<children>
-      				<TableView fx:id="tracksTable" editable="true" onKeyReleased="#tableKeyPressed" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-      					<columns>
-      						<TableColumn fx:id="titleColumn" minWidth="20.0" prefWidth="200.0" text="Title" />
-      						<TableColumn fx:id="artistColumn" minWidth="20.0" prefWidth="100.0" text="Artist" />
-      						<TableColumn fx:id="filenameColumn" minWidth="20" prefWidth="300.0" text="Filename" />
-      					</columns>
-      				</TableView>
-      			</children>
-      		</AnchorPane>
-      	</items>
-         <contextMenu>
-            <ContextMenu fx:id="tableMenu">
-              <items>
-                <MenuItem mnemonicParsing="false" onAction="#deleteFromPlaylist" text="Delete" />
-              </items>
-            </ContextMenu>
-         </contextMenu>
-      </SplitPane>
-      <HBox alignment="CENTER_RIGHT" maxHeight="25.0" minHeight="25.0" prefHeight="25.0" prefWidth="200.0">
-         <children>
-            <ProgressIndicator fx:id="backgroundIndicator" visible="false" />
-            <Label fx:id="backgroundLabel" visible="false">
-               <HBox.margin>
-                  <Insets right="10.0" />
-               </HBox.margin>
-            </Label>
-         </children>
-      </HBox>
-   </children>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="plow.controllers.MainController">
+	<children>
+		<MenuBar>
+			<menus>
+				<Menu mnemonicParsing="false" text="File">
+					<items>
+						<MenuItem mnemonicParsing="false" onAction="#saveMusicLibrary"
+							text="Save" />
+						<MenuItem mnemonicParsing="false" onAction="#exportToTraktor"
+							text="Export to Traktor" />
+						<MenuItem mnemonicParsing="false" onAction="#displaySettings" text="Settings" />
+						<MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
+					</items>
+				</Menu>
+				<Menu mnemonicParsing="false" text="Help">
+					<items>
+						<MenuItem mnemonicParsing="false" text="About" />
+					</items>
+				</Menu>
+			</menus>
+		</MenuBar>
+		<SplitPane dividerPositions="0.3" prefHeight="600.0"
+			prefWidth="800.0">
+			<items>
+				<AnchorPane SplitPane.resizableWithParent="false">
+					<children>
+						<ListView fx:id="playlistsView" AnchorPane.bottomAnchor="0.0"
+							AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+							AnchorPane.topAnchor="0.0" />
+					</children>
+				</AnchorPane>
+				<AnchorPane>
+					<children>
+						<TableView fx:id="tracksTable" editable="true"
+							onKeyReleased="#tableKeyPressed" tableMenuButtonVisible="true"
+							AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+							AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+							<columns>
+								<TableColumn fx:id="titleColumn" minWidth="20.0"
+									prefWidth="200.0" text="Title" />
+								<TableColumn fx:id="artistColumn" minWidth="20.0"
+									prefWidth="100.0" text="Artist" />
+								<TableColumn fx:id="filenameColumn" minWidth="20"
+									prefWidth="300.0" text="Filename" />
+							</columns>
+						</TableView>
+					</children>
+				</AnchorPane>
+			</items>
+			<contextMenu>
+				<ContextMenu fx:id="tableMenu">
+					<items>
+						<MenuItem mnemonicParsing="false" onAction="#deleteFromPlaylist"
+							text="Delete" />
+					</items>
+				</ContextMenu>
+			</contextMenu>
+		</SplitPane>
+		<HBox alignment="CENTER_RIGHT" maxHeight="25.0" minHeight="25.0"
+			prefHeight="25.0" prefWidth="200.0">
+			<children>
+				<ProgressIndicator fx:id="backgroundIndicator"
+					visible="false" />
+				<Label fx:id="backgroundLabel" visible="false">
+					<HBox.margin>
+						<Insets right="10.0" />
+					</HBox.margin>
+				</Label>
+			</children>
+		</HBox>
+	</children>
 </VBox>

@@ -7,7 +7,11 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+
+import javax.inject.Inject;
+
 import plow.model.Playlist;
+import plow.model.Settings;
 import plow.model.Track;
 
 public class MusicLibrary {
@@ -18,6 +22,16 @@ public class MusicLibrary {
 	private final StringProperty traktorLibrary = new SimpleStringProperty();
 
 	private final ObservableList<Playlist> playlists = FXCollections.observableArrayList();
+
+	@Inject
+	private Settings settings;
+
+	public MusicLibrary() {
+		// TODO: Possible bug: When shall we use the paths from Settings and
+		// when the paths injected by GSON?
+		// this.library.set(settings.getMusicLibraryFolder());
+		// this.traktorLibrary.set(settings.getTraktorLibraryFile());
+	}
 
 	public ObservableMap<String, Track> getTracks() {
 		return tracks;

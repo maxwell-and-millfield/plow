@@ -1,6 +1,7 @@
 package plow.controllers;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -30,8 +32,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+
+import javax.inject.Inject;
 
 import org.jaudiotagger.tag.FieldKey;
 
@@ -39,11 +44,14 @@ import plow.libraries.DirectoryScanner;
 import plow.libraries.LibraryWriter;
 import plow.libraries.MusicLibrary;
 import plow.libraries.TraktorLibraryWriter;
-import plow.model.ArgumentSettings;
 import plow.model.Playlist;
 import plow.model.Settings;
 import plow.model.Track;
 import plow.model.TrackId3TagValueFactory;
+import plow.ui.Main;
+
+import com.cathive.fx.guice.GuiceFXMLLoader;
+import com.cathive.fx.guice.GuiceFXMLLoader.Result;
 
 /**
  * The Main Controller. It initializes the Models and Views for Main.fxml.
@@ -52,20 +60,34 @@ import plow.model.TrackId3TagValueFactory;
  */
 public class MainController extends PlowController {
 
-	@FXML private ListView<Playlist> playlistsView;
+	@FXML
+	private ListView<Playlist> playlistsView;
 
-	@FXML private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
+	@FXML
+	private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
 
-	@FXML private TableView<Track> tracksTable;
+	@FXML
+	private TableView<Track> tracksTable;
 
-	@FXML private Label backgroundLabel;
+	@FXML
+	private Label backgroundLabel;
 
-	@FXML private ProgressIndicator backgroundIndicator;
+	@FXML
+	private ProgressIndicator backgroundIndicator;
 
-	@FXML private ContextMenu tableMenu;
+	@FXML
+	private ContextMenu tableMenu;
 
-	private final LibraryWriter libWriter = new LibraryWriter();
+	@Inject
+	private LibraryWriter libWriter;
+
 	private MusicLibrary lib;
+
+	@Inject
+	private Settings settings;
+
+	@Inject
+	GuiceFXMLLoader fxmlLoader;
 
 	@FXML
 	public void initialize() {
@@ -146,8 +168,7 @@ public class MainController extends PlowController {
 	}
 
 	private void initializeModels() {
-		final Settings settings = new ArgumentSettings();
-		lib = libWriter.load(Paths.get("library.plow"));
+		lib = libWriter.load(Paths.get(settings.getPlowLibraryFile()));
 		// lib.setLibrary(settings.getLibraryPath());
 		// lib.setTraktorLibrary(settings.getTraktorLibraryPath());
 		playlistsView.setItems(lib.getPlaylists());
@@ -214,13 +235,23 @@ public class MainController extends PlowController {
 		playlistsView.getScene().getWindow().hide();
 	}
 
+	public void displaySettings() throws IOException {
+		final Stage stage = new Stage();
+		final Result result = fxmlLoader.load(Main.class.getResource("Settings.fxml"));
+		final Scene scene = new Scene(result.<Parent> getRoot());
+		((PlowController) result.getController()).setScene(scene);
+		stage.setScene(scene);
+		stage.setTitle("Settings");
+		stage.show();
+	}
+
 	public void saveMusicLibrary() {
 		executeBackgroundTask(new Task<Boolean>() {
 
 			@Override
 			protected Boolean call() throws Exception {
 				updateMessage("Saving...");
-				libWriter.save(lib, Paths.get("library.plow"));
+				libWriter.save(lib, Paths.get(settings.getPlowLibraryFile()));
 				return true;
 			}
 
@@ -234,7 +265,28 @@ public class MainController extends PlowController {
 			@Override
 			protected Boolean call() throws Exception {
 				updateMessage("Exporting...");
+
+				// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+				// ░░░░░░░░░░░░░▄▄▄▄▄▄▄░░░░░░░░░
+				// ░░░░░░░░░▄▀▀▀░░░░░░░▀▄░░░░░░░
+				// ░░░░░░░▄▀░░░░░░░░░░░░▀▄░░░░░░
+				// ░░░░░░▄▀░░░░░░░░░░▄▀▀▄▀▄░░░░░
+				// ░░░░▄▀░░░░░░░░░░▄▀░░██▄▀▄░░░░
+				// ░░░▄▀░░▄▀▀▀▄░░░░█░░░▀▀░█▀▄░░░
+				// ░░░█░░█▄▄░░░█░░░▀▄░░░░░▐░█░░░
+				// ░░▐▌░░█▀▀░░▄▀░░░░░▀▄▄▄▄▀░░█░░
+				// ░░▐▌░░█░░░▄▀░░░░░░░░░░░░░░█░░
+				// ░░▐▌░░░▀▀▀░░░░░░░░░░░░░░░░▐▌░
+				// ░░▐▌░░░░░░░░░░░░░░░▄░░░░░░▐▌░
+				// ░░▐▌░░░░░░░░░▄░░░░░█░░░░░░▐▌░
+				// ░░░█░░░░░░░░░▀█▄░░▄█░░░░░░▐▌░
+				// ░░░▐▌░░░░░░░░░░▀▀▀▀░░░░░░░▐▌░
+				// ░░░░█░░░░░░░░░░░░░░░░░░░░░█░░
+				// ░░░░▐▌▀▄░░░░░░░░░░░░░░░░░▐▌░░
+				// ░░░░░█░░▀░░░░░░░░░░░░░░░░▀░░░
+				// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 				System.out.println("mhm");
+
 				tw.writeToTraktorLibrary(lib);
 				return true;
 			}
@@ -255,8 +307,7 @@ public class MainController extends PlowController {
 		});
 	}
 
-	@SuppressWarnings("unchecked")
-	protected void executeBackgroundTask(@SuppressWarnings("rawtypes") final Task t) {
+	protected void executeBackgroundTask(final Task<?> t) {
 		backgroundLabel.textProperty().bind(t.messageProperty());
 		t.stateProperty().addListener(new ChangeListener<State>() {
 			@Override

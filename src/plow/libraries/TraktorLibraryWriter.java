@@ -35,6 +35,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import plow.model.Constants;
 import plow.model.Playlist;
 import plow.model.Track;
 
@@ -166,7 +167,9 @@ public class TraktorLibraryWriter {
 	}
 
 	protected String toTraktorFileName(final String filename) {
-		return filename.replace("\\", "/").replace("/", "/:");
+		return filename.replace(Constants.PATH_SEPARATOR_WIN, Constants.PATH_SEPARATOR)
+				.replace(Constants.PATH_SEPARATOR_MAC, Constants.PATH_SEPARATOR)
+				.replace(Constants.PATH_SEPARATOR, Constants.PATH_SEPARATOR_NI);
 	}
 
 	protected void writeToFile(final Node doc, final File out) {
@@ -191,8 +194,10 @@ public class TraktorLibraryWriter {
 	public void decorateEntryWithLocation(final Element e, final String filename) {
 		final Path p = Paths.get(filename);
 		if (isWindowsFileSystem(p.getFileSystem())) {
-			final String drive = p.getRoot().toString().replace("\\", "").replace("/", "");
-			final String dir = toTraktorFileName("/" + p.getRoot().relativize(p.getParent()).toString() + "/");
+			final String drive = p.getRoot().toString().replace(Constants.PATH_SEPARATOR_WIN, "")
+					.replace(Constants.PATH_SEPARATOR_MAC, "");
+			final String dir = toTraktorFileName(Constants.PATH_SEPARATOR
+					+ p.getRoot().relativize(p.getParent()).toString() + Constants.PATH_SEPARATOR);
 			String volumeId = "";
 			try {
 				final FileStore cDriveFS = Files.getFileStore(p.getRoot());
@@ -209,7 +214,8 @@ public class TraktorLibraryWriter {
 			location.setAttribute("VOLUME", drive);
 			e.appendChild(location);
 		} else {
-			final String dir = toTraktorFileName("/" + p.getParent().toString() + "/");
+			final String dir = toTraktorFileName(Constants.PATH_SEPARATOR + p.getParent().toString()
+					+ Constants.PATH_SEPARATOR);
 			final String trackFilename = p.getFileName().toString();
 			final Element location = e.getOwnerDocument().createElement("LOCATION");
 			location.setAttribute("DIR", dir);
