@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import plow.model.Playlist;
+import plow.model.Settings;
 import plow.model.Track;
 
 public class MusicLibrary {
@@ -18,6 +19,15 @@ public class MusicLibrary {
 	private final StringProperty traktorLibrary = new SimpleStringProperty();
 
 	private final ObservableList<Playlist> playlists = FXCollections.observableArrayList();
+
+	public MusicLibrary() {
+
+	}
+
+	public MusicLibrary(final Settings settings) {
+		this.library.set(settings.getMusicLibraryFolder());
+		this.traktorLibrary.set(settings.getTraktorLibraryFile());
+	}
 
 	public ObservableMap<String, Track> getTracks() {
 		return tracks;

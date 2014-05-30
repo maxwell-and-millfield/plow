@@ -13,4 +13,6 @@ public class Constants {
 
 	public static final String PATH_SEPARATOR_NI = "/:";
 
+	public static final String LIBRARY_FILE_NAME = "library.plow";
+
 }

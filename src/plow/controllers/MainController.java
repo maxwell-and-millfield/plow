@@ -1,6 +1,7 @@
 package plow.controllers;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
@@ -39,7 +41,7 @@ import plow.libraries.DirectoryScanner;
 import plow.libraries.LibraryWriter;
 import plow.libraries.MusicLibrary;
 import plow.libraries.TraktorLibraryWriter;
-import plow.model.ArgumentSettings;
+import plow.model.FileSettings;
 import plow.model.Playlist;
 import plow.model.Settings;
 import plow.model.Track;
@@ -52,20 +54,27 @@ import plow.model.TrackId3TagValueFactory;
  */
 public class MainController extends PlowController {
 
-	@FXML private ListView<Playlist> playlistsView;
+	@FXML
+	private ListView<Playlist> playlistsView;
 
-	@FXML private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
+	@FXML
+	private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
 
-	@FXML private TableView<Track> tracksTable;
+	@FXML
+	private TableView<Track> tracksTable;
 
-	@FXML private Label backgroundLabel;
+	@FXML
+	private Label backgroundLabel;
 
-	@FXML private ProgressIndicator backgroundIndicator;
+	@FXML
+	private ProgressIndicator backgroundIndicator;
 
-	@FXML private ContextMenu tableMenu;
+	@FXML
+	private ContextMenu tableMenu;
 
-	private final LibraryWriter libWriter = new LibraryWriter();
+	private LibraryWriter libWriter;
 	private MusicLibrary lib;
+	private Settings settings;
 
 	@FXML
 	public void initialize() {
@@ -146,8 +155,9 @@ public class MainController extends PlowController {
 	}
 
 	private void initializeModels() {
-		final Settings settings = new ArgumentSettings();
-		lib = libWriter.load(Paths.get("library.plow"));
+		settings = new FileSettings();
+		libWriter = new LibraryWriter(settings);
+		lib = libWriter.load(Paths.get(settings.getPlowLibraryFile()));
 		// lib.setLibrary(settings.getLibraryPath());
 		// lib.setTraktorLibrary(settings.getTraktorLibraryPath());
 		playlistsView.setItems(lib.getPlaylists());
@@ -214,13 +224,18 @@ public class MainController extends PlowController {
 		playlistsView.getScene().getWindow().hide();
 	}
 
+	public void displaySettings() throws IOException {
+		final Stage stage = new Stage();
+		SettingsController.start(stage);
+	}
+
 	public void saveMusicLibrary() {
 		executeBackgroundTask(new Task<Boolean>() {
 
 			@Override
 			protected Boolean call() throws Exception {
 				updateMessage("Saving...");
-				libWriter.save(lib, Paths.get("library.plow"));
+				libWriter.save(lib, Paths.get(settings.getPlowLibraryFile()));
 				return true;
 			}
 
@@ -255,8 +270,7 @@ public class MainController extends PlowController {
 		});
 	}
 
-	@SuppressWarnings("unchecked")
-	protected void executeBackgroundTask(@SuppressWarnings("rawtypes") final Task t) {
+	protected void executeBackgroundTask(final Task<?> t) {
 		backgroundLabel.textProperty().bind(t.messageProperty());
 		t.stateProperty().addListener(new ChangeListener<State>() {
 			@Override
