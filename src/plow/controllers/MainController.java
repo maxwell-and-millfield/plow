@@ -13,6 +13,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -35,17 +36,22 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
+import javax.inject.Inject;
+
 import org.jaudiotagger.tag.FieldKey;
 
 import plow.libraries.DirectoryScanner;
 import plow.libraries.LibraryWriter;
 import plow.libraries.MusicLibrary;
 import plow.libraries.TraktorLibraryWriter;
-import plow.model.FileSettings;
 import plow.model.Playlist;
 import plow.model.Settings;
 import plow.model.Track;
 import plow.model.TrackId3TagValueFactory;
+import plow.ui.Main;
+
+import com.cathive.fx.guice.GuiceFXMLLoader;
+import com.cathive.fx.guice.GuiceFXMLLoader.Result;
 
 /**
  * The Main Controller. It initializes the Models and Views for Main.fxml.
@@ -72,9 +78,16 @@ public class MainController extends PlowController {
 	@FXML
 	private ContextMenu tableMenu;
 
+	@Inject
 	private LibraryWriter libWriter;
+
 	private MusicLibrary lib;
+
+	@Inject
 	private Settings settings;
+
+	@Inject
+	GuiceFXMLLoader fxmlLoader;
 
 	@FXML
 	public void initialize() {
@@ -155,8 +168,6 @@ public class MainController extends PlowController {
 	}
 
 	private void initializeModels() {
-		settings = new FileSettings();
-		libWriter = new LibraryWriter(settings);
 		lib = libWriter.load(Paths.get(settings.getPlowLibraryFile()));
 		// lib.setLibrary(settings.getLibraryPath());
 		// lib.setTraktorLibrary(settings.getTraktorLibraryPath());
@@ -226,7 +237,12 @@ public class MainController extends PlowController {
 
 	public void displaySettings() throws IOException {
 		final Stage stage = new Stage();
-		SettingsController.start(stage);
+		final Result result = fxmlLoader.load(Main.class.getResource("Settings.fxml"));
+		final Scene scene = new Scene(result.<Parent> getRoot());
+		((PlowController) result.getController()).setScene(scene);
+		stage.setScene(scene);
+		stage.setTitle("Settings");
+		stage.show();
 	}
 
 	public void saveMusicLibrary() {

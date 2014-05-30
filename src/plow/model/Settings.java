@@ -1,5 +1,8 @@
 package plow.model;
 
+import com.google.inject.ImplementedBy;
+
+@ImplementedBy(FileSettings.class)
 public interface Settings {
 
 	/**

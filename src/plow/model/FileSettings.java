@@ -15,6 +15,10 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
 public class FileSettings implements Settings {
 
 	private final File settingsFile;
@@ -27,6 +31,7 @@ public class FileSettings implements Settings {
 
 	private final static String SETTINGS_FILE = ".plow.preferences";
 
+	@Inject
 	public FileSettings() {
 		settingsFile = new File(System.getProperty("user.home"), SETTINGS_FILE);
 		properties = new Properties();

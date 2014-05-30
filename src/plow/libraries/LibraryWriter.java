@@ -8,6 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javafx.beans.property.StringProperty;
+
+import javax.inject.Inject;
+
 import plow.libraries.serializer.MusicLibraryDeserializer;
 import plow.libraries.serializer.PlaylistSerializer;
 import plow.libraries.serializer.StringPropertySerializer;
@@ -23,11 +26,10 @@ public class LibraryWriter {
 
 	private final Gson gson;
 
-	private final Settings settings;
+	@Inject
+	private Settings settings;
 
-	public LibraryWriter(final Settings settings) {
-		this.settings = settings;
-
+	public LibraryWriter() {
 		final GsonBuilder builder = new GsonBuilder();
 		builder.registerTypeAdapter(MusicLibrary.class, new MusicLibraryDeserializer());
 		builder.registerTypeAdapter(Playlist.class, new PlaylistSerializer());
@@ -58,7 +60,7 @@ public class LibraryWriter {
 				throw new RuntimeException(x);
 			}
 		} else {
-			return new MusicLibrary(settings);
+			return new MusicLibrary();
 		}
 	}
 
