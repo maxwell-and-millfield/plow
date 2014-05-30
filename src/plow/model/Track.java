@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-import org.eclipse.core.runtime.Path;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -131,7 +130,7 @@ public class Track {
 	public Tag getTag() {
 		if (tag == null) {
 			try {
-				final AudioFile file = new AudioFileIO().readFile(new File(lib.getLibrary() + Path.SEPARATOR
+				final AudioFile file = new AudioFileIO().readFile(new File(lib.getLibrary() + Constants.PATH_SEPARATOR
 						+ filenamePrefix + filename));
 				tag = file.getTag();
 			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException

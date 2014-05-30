@@ -3,9 +3,7 @@ package plow.libraries;
 import java.io.File;
 
 import javafx.application.Platform;
-
-import org.eclipse.core.runtime.Path;
-
+import plow.model.Constants;
 import plow.model.Playlist;
 import plow.model.Track;
 
@@ -22,12 +20,12 @@ public class DirectoryScanner {
 	public void readAndSynchronize(final MusicLibrary lib, final File folder, final String prefix) {
 		Playlist potentialPlaylist = null;
 		for (final File f : folder.listFiles()) {
-			final String filenameWithPrefix = ((prefix != "") ? prefix + Path.SEPARATOR : "") + f.getName();
+			final String filenameWithPrefix = ((prefix != "") ? prefix + Constants.PATH_SEPARATOR : "") + f.getName();
 			if (f.isDirectory()) {
 				readAndSynchronize(lib, f, filenameWithPrefix);
 			} else if (isTrackFile(f)) {
 				if (!lib.getTracks().containsKey(filenameWithPrefix)) {
-					final Track t = new Track(lib, prefix + Path.SEPARATOR, f.getName());
+					final Track t = new Track(lib, prefix + Constants.PATH_SEPARATOR, f.getName());
 					t.setLastModified(f.lastModified());
 					lib.addTrack(t);
 					if (potentialPlaylist == null) {
