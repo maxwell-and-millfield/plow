@@ -23,9 +23,9 @@ public class DirectoryScanner {
 		Playlist potentialPlaylist = null;
 		for (final File f : folder.listFiles()) {
 			final String filenameWithPrefix = ((prefix != "") ? prefix + Path.SEPARATOR : "") + f.getName();
-			if (f.isDirectory()) {
+			if (f.isDirectory() && !f.isHidden()) {
 				readAndSynchronize(lib, f, filenameWithPrefix);
-			} else if (isTrackFile(f)) {
+			} else if (!f.isHidden() && isTrackFile(f)) {
 				if (!lib.getTracks().containsKey(filenameWithPrefix)) {
 					final Track t = new Track(lib, prefix + Path.SEPARATOR, f.getName());
 					t.setLastModified(f.lastModified());
