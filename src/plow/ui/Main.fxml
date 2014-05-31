@@ -61,8 +61,10 @@
 			<contextMenu>
 				<ContextMenu fx:id="tableMenu">
 					<items>
+					<MenuItem mnemonicParsing="false" onAction="#showTrack"
+							text="Edit Tags" />
 						<MenuItem mnemonicParsing="false" onAction="#deleteFromPlaylist"
-							text="Delete" />
+							text="Delete" />	
 					</items>
 				</ContextMenu>
 			</contextMenu>

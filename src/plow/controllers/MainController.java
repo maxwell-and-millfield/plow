@@ -60,34 +60,25 @@ import com.cathive.fx.guice.GuiceFXMLLoader.Result;
  */
 public class MainController extends PlowController {
 
-	@FXML
-	private ListView<Playlist> playlistsView;
+	@FXML private ListView<Playlist> playlistsView;
 
-	@FXML
-	private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
+	@FXML private TableColumn<Track, String> titleColumn, artistColumn, filenameColumn;
 
-	@FXML
-	private TableView<Track> tracksTable;
+	@FXML private TableView<Track> tracksTable;
 
-	@FXML
-	private Label backgroundLabel;
+	@FXML private Label backgroundLabel;
 
-	@FXML
-	private ProgressIndicator backgroundIndicator;
+	@FXML private ProgressIndicator backgroundIndicator;
 
-	@FXML
-	private ContextMenu tableMenu;
+	@FXML private ContextMenu tableMenu;
 
-	@Inject
-	private LibraryWriter libWriter;
+	@Inject private LibraryWriter libWriter;
 
 	private MusicLibrary lib;
 
-	@Inject
-	private Settings settings;
+	@Inject private Settings settings;
 
-	@Inject
-	GuiceFXMLLoader fxmlLoader;
+	@Inject GuiceFXMLLoader fxmlLoader;
 
 	@FXML
 	public void initialize() {
@@ -265,28 +256,6 @@ public class MainController extends PlowController {
 			@Override
 			protected Boolean call() throws Exception {
 				updateMessage("Exporting...");
-
-				// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-				// ░░░░░░░░░░░░░▄▄▄▄▄▄▄░░░░░░░░░
-				// ░░░░░░░░░▄▀▀▀░░░░░░░▀▄░░░░░░░
-				// ░░░░░░░▄▀░░░░░░░░░░░░▀▄░░░░░░
-				// ░░░░░░▄▀░░░░░░░░░░▄▀▀▄▀▄░░░░░
-				// ░░░░▄▀░░░░░░░░░░▄▀░░██▄▀▄░░░░
-				// ░░░▄▀░░▄▀▀▀▄░░░░█░░░▀▀░█▀▄░░░
-				// ░░░█░░█▄▄░░░█░░░▀▄░░░░░▐░█░░░
-				// ░░▐▌░░█▀▀░░▄▀░░░░░▀▄▄▄▄▀░░█░░
-				// ░░▐▌░░█░░░▄▀░░░░░░░░░░░░░░█░░
-				// ░░▐▌░░░▀▀▀░░░░░░░░░░░░░░░░▐▌░
-				// ░░▐▌░░░░░░░░░░░░░░░▄░░░░░░▐▌░
-				// ░░▐▌░░░░░░░░░▄░░░░░█░░░░░░▐▌░
-				// ░░░█░░░░░░░░░▀█▄░░▄█░░░░░░▐▌░
-				// ░░░▐▌░░░░░░░░░░▀▀▀▀░░░░░░░▐▌░
-				// ░░░░█░░░░░░░░░░░░░░░░░░░░░█░░
-				// ░░░░▐▌▀▄░░░░░░░░░░░░░░░░░▐▌░░
-				// ░░░░░█░░▀░░░░░░░░░░░░░░░░▀░░░
-				// ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-				System.out.println("mhm");
-
 				tw.writeToTraktorLibrary(lib);
 				return true;
 			}
@@ -329,5 +298,22 @@ public class MainController extends PlowController {
 		if (e.getCode() == KeyCode.DELETE) {
 			deleteFromPlaylist();
 		}
+	}
+
+	public void showTrack() throws IOException {
+		if (tracksTable.getSelectionModel().isEmpty()) {
+			return;
+		}
+		final Track t = tracksTable.getSelectionModel().getSelectedItem();
+		final Stage stage = new Stage();
+		final Result result = fxmlLoader.load(Main.class.getResource("Track.fxml"));
+		((TrackController) result.getController()).setTrack(t);
+		((TrackController) result.getController()).setLibrary(lib);
+		final Scene scene = new Scene(result.<Parent> getRoot());
+		((PlowController) result.getController()).setScene(scene);
+
+		stage.setScene(scene);
+		stage.setTitle("Settings");
+		stage.show();
 	}
 }
