@@ -130,6 +130,7 @@ public class Track {
 	public Tag getTag() {
 		if (tag == null) {
 			try {
+				System.out.println(lib.getLibrary());
 				final AudioFile file = new AudioFileIO().readFile(new File(lib.getLibrary() + Constants.PATH_SEPARATOR
 						+ filenamePrefix + filename));
 				tag = file.getTag();

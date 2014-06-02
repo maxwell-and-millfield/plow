@@ -21,10 +21,12 @@ public class Playlist {
 	private String id;
 	private transient HashMap<Track, SimpleBooleanProperty> tracksInPlaylist = new HashMap<>();
 
+	/**
+	 * Set to true when changes in the tracklist are currently handled. To
+	 * prevent endless loops, listeners on the tracksInPlaylis-Properties should
+	 * not perform actions on the list in this case.
+	 */
 	private boolean isHandlingChanges = false;
-
-	{
-	}
 
 	public Playlist() {
 		final SecureRandom sr = new SecureRandom();

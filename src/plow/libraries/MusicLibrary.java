@@ -23,8 +23,7 @@ public class MusicLibrary {
 
 	private final ObservableList<Playlist> playlists = FXCollections.observableArrayList();
 
-	@Inject
-	private Settings settings;
+	@Inject private Settings settings;
 
 	public MusicLibrary() {
 		// TODO: Possible bug: When shall we use the paths from Settings and

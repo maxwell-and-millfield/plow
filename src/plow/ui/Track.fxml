@@ -48,8 +48,8 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <TextField fx:id="searchBox" />
-                  <SplitMenuButton fx:id="searchButton" mnemonicParsing="false" text="Search" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+                  <TextField fx:id="searchBox" onAction="#searchTags" />
+                  <SplitMenuButton fx:id="searchButton" mnemonicParsing="false" onAction="#searchTags" text="Search" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
                     <items>
                         <RadioMenuItem mnemonicParsing="false" text="Beatport">
                            <toggleGroup>
@@ -63,10 +63,10 @@
             </GridPane>
             <TableView fx:id="searchResults" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
               <columns>
-                <TableColumn prefWidth="75.0" text="Title" />
-                <TableColumn prefWidth="75.0" text="Artist" />
-                  <TableColumn prefWidth="75.0" text="Year" />
-                  <TableColumn prefWidth="75.0" text="Release" />
+                <TableColumn fx:id="titleColumn" prefWidth="75.0" text="Title" />
+                <TableColumn fx:id="artistColumn" prefWidth="75.0" text="Artist" />
+                  <TableColumn fx:id="yearColumn" prefWidth="75.0" text="Year" />
+                  <TableColumn fx:id="albumColumn" prefWidth="75.0" text="Album" />
               </columns>
             </TableView>
          </children>

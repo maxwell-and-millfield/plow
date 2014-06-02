@@ -26,6 +26,7 @@ public class MusicLibraryDeserializer implements JsonDeserializer<MusicLibrary> 
 		if (element instanceof JsonObject) {
 			final JsonObject object = (JsonObject) element;
 			final MusicLibrary result = new MusicLibrary();
+			System.out.println(object.get("library"));
 			result.setLibrary(object.get("library").getAsString());
 			result.setTraktorLibrary(object.get("traktorLibrary").getAsString());
 			for (final Entry<String, JsonElement> e : object.get("tracks").getAsJsonObject().entrySet()) {

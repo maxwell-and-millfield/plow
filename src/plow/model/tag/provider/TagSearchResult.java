@@ -1,4 +1,4 @@
-package plow.model;
+package plow.model.tag.provider;
 
 public class TagSearchResult {
 
